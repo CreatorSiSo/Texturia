@@ -3,8 +3,6 @@
 #include <string>
 #include <functional>
 
-#include "Config.hpp"
-
 namespace Texturia {
 
 // Events are currently blocking, meaning when an event occurs it

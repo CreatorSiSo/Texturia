@@ -15,7 +15,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # Project Setup
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(Texturia VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -30,6 +30,7 @@ set(SOURCES
 
 # Targets
 add_executable(${PROJECT_NAME} ${SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 
 # Includes
 target_include_directories(${PROJECT_NAME}
@@ -39,6 +40,11 @@ target_include_directories(${PROJECT_NAME}
 
 # External Libraries
 add_subdirectory(./libs/spdlog)
+
+# Precompiled Headers
+target_precompile_headers(${PROJECT_NAME}
+  PRIVATE ./src/txpch.hpp
+)
 
 # Linking
 target_link_libraries(${PROJECT_NAME}

@@ -1,6 +1,5 @@
 #include "CoreApp.hpp"
 #include "Events/AppEvent.hpp"
-#include "Log.hpp"
 
 Texturia::CoreApp::CoreApp() {}
 
