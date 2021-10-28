@@ -23,6 +23,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Source Files
 set(SOURCES
+    ./src/CoreApp.cpp
     ./src/Log.cpp
     ./src/Main.cpp
 )
@@ -33,6 +34,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 # Includes
 target_include_directories(${PROJECT_NAME}
     PUBLIC ./libs/spdlog/include
+    PRIVATE ./src
 )
 
 # External Libraries

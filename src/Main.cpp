@@ -1,12 +1,8 @@
-#include <iostream>
-
-#include "Log.hpp"
+#include "CoreApp.hpp"
 
 int main(int argc, char** argv) {
-    Texturia::Log::Init();
-    TX_INFO("Initialized Logger");
-    
-    TX_WARN("Hello World");
-
-    return 0;
+  auto app = Texturia::CreateCoreApp();
+  app->Run();
+  delete app;
+  return 0;
 }
