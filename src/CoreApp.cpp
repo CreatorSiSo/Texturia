@@ -14,9 +14,8 @@ void Texturia::CoreApp::Run() {
   WindowResizeEvent e(1280, 720);
   TX_TRACE(e);
 
-  while(true) {}
+  while (true) {
+  }
 }
 
-Texturia::CoreApp* Texturia::CreateCoreApp() {
-  return new CoreApp;
-}
+Texturia::CoreApp *Texturia::CreateCoreApp() { return new CoreApp; }

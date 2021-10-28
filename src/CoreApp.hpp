@@ -2,14 +2,14 @@
 
 namespace Texturia {
 
-  class CoreApp {
-  public:
-    CoreApp();
-    ~CoreApp();
+class CoreApp {
+public:
+  CoreApp();
+  ~CoreApp();
 
-    void Run();
-  };
+  void Run();
+};
 
-  CoreApp* CreateCoreApp();
+CoreApp *CreateCoreApp();
 
-}
+} // namespace Texturia

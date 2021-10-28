@@ -2,20 +2,23 @@
 
 #include <memory.h>
 
-#include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
 
 namespace Texturia {
 
-  class Log {
-    public:
-      static void Init();
-      inline static std::shared_ptr<spdlog::logger>& GetLogger() { return s_Logger; }
-    private:
-      static std::shared_ptr<spdlog::logger> s_Logger;
-  };
+class Log {
+public:
+  static void Init();
+  inline static std::shared_ptr<spdlog::logger> &GetLogger() {
+    return s_Logger;
+  }
 
-}
+private:
+  static std::shared_ptr<spdlog::logger> s_Logger;
+};
+
+} // namespace Texturia
 
 // Log Macros
 #define TX_TRACE(...) Texturia::Log::GetLogger()->trace(__VA_ARGS__)
