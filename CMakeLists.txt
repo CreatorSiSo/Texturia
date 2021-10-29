@@ -35,11 +35,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 # Includes
 target_include_directories(${PROJECT_NAME}
     PUBLIC ./libs/spdlog/include
+    PUBLIC ./libs/glfw/include
     PRIVATE ./src
 )
 
 # External Libraries
 add_subdirectory(./libs/spdlog)
+add_subdirectory(./libs/glfw)
 
 # Precompiled Headers
 target_precompile_headers(${PROJECT_NAME}
@@ -49,4 +51,5 @@ target_precompile_headers(${PROJECT_NAME}
 # Linking
 target_link_libraries(${PROJECT_NAME}
     spdlog
+    glfw
 )
