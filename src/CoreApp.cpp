@@ -23,14 +23,9 @@ void Texturia::CoreApp::Run() {
   Texturia::Log::Init();
   TX_INFO("Initialized Logger");
 
-  TX_WARN("Hello World");
-
-  WindowResizeEvent e(1280, 720);
-  TX_TRACE(e);
-
   WindowProps props;
 
-  TX_INFO("Creating Window {0} ({1} {2})", props.Title, props.Width,
+  TX_INFO("Creating Window '{0}' ({1}, {2})", props.Title, props.Width,
           props.Height);
 
   GLFWwindow *window;
