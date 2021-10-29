@@ -69,7 +69,8 @@ public:
 
   template <typename Type> bool Dispatch(EventFunction<Type> function) {
     if (m_Event.GetEventType() == Type::GetStaticType()) {
-      m_Event.m_Handled = function(*(Type *)&m_Event) return true;
+      m_Event.m_Handled = function(*(Type *)&m_Event);
+      return true;
     }
     return false;
   }

@@ -4,8 +4,8 @@
 #define TX_ASSERT(x, ...)                                                      \
   {                                                                            \
     if (!(x)) {                                                                \
-      TX_ERROR("Assertion Failed: {0]", __VA_ARGS__);                          \
-      __debugbreak();                                                          \
+      TX_ERROR("Assertion Failed: {0}", __VA_ARGS__);                          \
+      debug_break();                                                           \
     }                                                                          \
   }
 // #else

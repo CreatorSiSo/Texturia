@@ -14,5 +14,6 @@
 #include <vector>
 
 #include "Config.hpp"
+#include "debugbreak.h"
 
 #include "Log.hpp"

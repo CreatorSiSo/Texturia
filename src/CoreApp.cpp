@@ -1,5 +1,7 @@
 #include "txpch.hpp"
 
+#include <GLFW/glfw3.h>
+
 #include "CoreApp.hpp"
 #include "Events/AppEvent.hpp"
 
