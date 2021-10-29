@@ -1,5 +1,7 @@
 #pragma once
 
+#include "txpch.hpp"
+
 namespace Texturia {
 
 class CoreApp {

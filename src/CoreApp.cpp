@@ -1,3 +1,5 @@
+#include "txpch.hpp"
+
 #include "CoreApp.hpp"
 #include "Events/AppEvent.hpp"
 
