@@ -1,27 +1,28 @@
 #include "txpch.hpp"
 
-#include <GLFW/glfw3.h>
-
 #include "CoreApp.hpp"
 #include "Events/AppEvent.hpp"
+#include "Window.hpp"
 
 Texturia::CoreApp::CoreApp() {}
 
 Texturia::CoreApp::~CoreApp() {}
 
 void Texturia::CoreApp::Run() {
-  struct WindowProps {
-    std::string Title;
-    int Width;
-    int Height;
-
-    WindowProps(const std::string &title = "Texturia",
-                unsigned int width = 1600, unsigned int height = 900)
-        : Title(title), Width(width), Height(height) {}
-  };
-
-  Texturia::Log::Init();
+  Log::Init();
   TX_INFO("Initialized Logger");
+
+  auto test1 = Window::Create();
+  auto test2 = Window::Create();
+  while (m_Running) {
+    test1->OnUpdate();
+    test2->OnUpdate();
+  }
+  delete test1;
+  delete test2;
+}
+
+Texturia::CoreApp *Texturia::CreateCoreApp() { return new CoreApp; }
 
   WindowProps props;
 
