@@ -24,6 +24,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Source Files
 set(SOURCES
   ./src/CoreApp.cpp
+  ./src/Layer.cpp
+  ./src/LayerStack.cpp
   ./src/Log.cpp
   ./src/Main.cpp
   ./src/Window.cpp
