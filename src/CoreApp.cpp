@@ -1,8 +1,6 @@
 #include "txpch.hpp"
 
 #include "CoreApp.hpp"
-#include "Events/AppEvent.hpp"
-#include "Window.hpp"
 
 namespace Texturia {
 

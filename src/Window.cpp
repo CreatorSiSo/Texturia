@@ -1,8 +1,5 @@
 #include "txpch.hpp"
 
-#include "Events/AppEvent.hpp"
-#include "Events/KeyEvent.hpp"
-#include "Events/MouseEvent.hpp"
 #include "Window.hpp"
 
 namespace Texturia {

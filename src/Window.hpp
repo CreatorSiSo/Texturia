@@ -4,7 +4,10 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Events/AppEvent.hpp"
 #include "Events/Event.hpp"
+#include "Events/KeyEvent.hpp"
+#include "Events/MouseEvent.hpp"
 
 namespace Texturia {
 
