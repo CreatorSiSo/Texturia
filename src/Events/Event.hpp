@@ -62,14 +62,14 @@ protected:
 };
 
 class EventDispatcher {
-  template <typename Type> using EventFunction = std::function<bool>(Type &);
+  template <typename T> using EventFunction = std::function<bool(T &)>;
 
 public:
-  EventDispatcher(Event &event) : m_Event(event) {}
+  EventDispatcher(Event &e) : m_Event(e) {}
 
-  template <typename Type> bool Dispatch(EventFunction<Type> function) {
-    if (m_Event.GetEventType() == Type::GetStaticType()) {
-      m_Event.m_Handled = function(*(Type *)&m_Event);
+  template <typename T> bool Dispatch(EventFunction<T> function) {
+    if (m_Event.GetEventType() == T::GetStaticType()) {
+      m_Event.m_Handled = function(*(T *)&m_Event);
       return true;
     }
     return false;

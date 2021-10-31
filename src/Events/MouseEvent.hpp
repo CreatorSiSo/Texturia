@@ -61,8 +61,7 @@ protected:
 
 class MouseButtonDownEvent : public MouseButtonEvent {
 public:
-  MouseButtonDownEvent(int button, int repeatCount)
-      : MouseButtonEvent(button) {}
+  MouseButtonDownEvent(int button) : MouseButtonEvent(button) {}
 
   std::string ToString() const override {
     std::stringstream ss;

@@ -4,59 +4,38 @@
 #include "Events/AppEvent.hpp"
 #include "Window.hpp"
 
-Texturia::CoreApp::CoreApp() {}
+namespace Texturia {
 
-Texturia::CoreApp::~CoreApp() {}
+#define BIND_EVENT_FN(x) std::bind(&CoreApp::x, this, std::placeholders::_1)
 
-void Texturia::CoreApp::Run() {
+CoreApp::CoreApp() {
   Log::Init();
   TX_INFO("Initialized Logger");
 
-  auto test1 = Window::Create();
-  auto test2 = Window::Create();
+  m_Window = std::unique_ptr<Window>(Window::Create());
+  m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+}
+
+CoreApp::~CoreApp() {}
+
+void CoreApp::Run() {
   while (m_Running) {
-    test1->OnUpdate();
-    test2->OnUpdate();
+    m_Window->OnUpdate();
   }
-  delete test1;
-  delete test2;
 }
 
-Texturia::CoreApp *Texturia::CreateCoreApp() { return new CoreApp; }
+void CoreApp::OnEvent(Event &e) {
+  EventDispatcher dispatcher(e);
+  dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 
-  WindowProps props;
-
-  TX_INFO("Creating Window '{0}' ({1}, {2})", props.Title, props.Width,
-          props.Height);
-
-  GLFWwindow *window;
-
-  bool GLFWInitialized = false;
-  if (!GLFWInitialized) {
-    // TODO glfwTerminate() on system shutdown
-    int success = glfwInit();
-    TX_ASSERT(success, "Could not initialize glfw!");
-
-    GLFWInitialized = true;
-  }
-
-  window = glfwCreateWindow(props.Width, props.Height, props.Title.c_str(),
-                            NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    exit(EXIT_FAILURE);
-  }
-
-  glfwMakeContextCurrent(window);
-  glfwSwapInterval(1);
-  // glfwSetWindowUserPointer(window, NULL);
-
-  while (!glfwWindowShouldClose(window)) {
-    glfwPollEvents();
-    glfwSwapBuffers(window);
-  }
-
-  glfwTerminate();
+  TX_TRACE("{0}", e);
 }
 
-Texturia::CoreApp *Texturia::CreateCoreApp() { return new CoreApp; }
+bool CoreApp::OnWindowClose(WindowCloseEvent &e) {
+  m_Running = false;
+  return true;
+}
+
+CoreApp *CreateCoreApp() { return new CoreApp; }
+
+} // namespace Texturia

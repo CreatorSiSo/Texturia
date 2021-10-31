@@ -47,6 +47,9 @@ private:
   void Init(const WindowProps &props);
   void Shutdown();
 
+  void OnEvent(Event &e);
+  bool OnWindowClose(WindowCloseEvent &e);
+
   struct WindowData {
     std::string Title;
     unsigned int Width, Height;
