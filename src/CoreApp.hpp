@@ -23,9 +23,13 @@ public:
   void PushLayer(Layer *layer);
   void PushOverlay(Layer *overlay);
 
+  inline static CoreApp &GetCoreApp() { return *s_Instance; }
+  inline Window &GetWindow() { return *m_Window; }
+
 private:
   bool OnWindowClose(WindowCloseEvent &e);
 
+  static CoreApp *s_Instance;
   std::unique_ptr<Window> m_Window;
   LayerStack m_LayerStack;
   bool m_Running = true;

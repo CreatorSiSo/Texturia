@@ -17,3 +17,5 @@
 #include "debugbreak.h"
 
 #include "Log.hpp"
+
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD

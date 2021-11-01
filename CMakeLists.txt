@@ -29,6 +29,8 @@ set(SOURCES
   ./src/Log.cpp
   ./src/Main.cpp
   ./src/Window.cpp
+  ./src/ImGui/ImGuiLayer.cpp
+  ./src/Platforms/OpenGL/ImGuiOpenGL3Renderer.cpp
 )
 
 # Targets
