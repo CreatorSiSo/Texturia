@@ -7,3 +7,7 @@
 [submodule "debugbreak"]
 	path = libs/debugbreak
 	url = https://github.com/scottt/debugbreak.git
+[submodule "imgui"]
+	path = libs/imgui
+	url = https://github.com/CreatorSiSo/imgui.git
+	branch = docking
