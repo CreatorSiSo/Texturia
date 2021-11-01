@@ -40,6 +40,7 @@ target_include_directories(${PROJECT_NAME}
   PUBLIC ./libs/debugbreak
   PUBLIC ./libs/glad/include
   PUBLIC ./libs/glfw/include
+  PUBLIC ./libs/imgui
   PUBLIC ./libs/spdlog/include
   PRIVATE ./src
 )
@@ -47,12 +48,14 @@ target_include_directories(${PROJECT_NAME}
 # External Libraries
 add_subdirectory(./libs/glad)
 add_subdirectory(./libs/glfw)
+add_subdirectory(./libs/imgui)
 add_subdirectory(./libs/spdlog)
 
 # Linking
 target_link_libraries(${PROJECT_NAME}
   glad
   glfw
+  imgui
   spdlog
 )
 
