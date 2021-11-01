@@ -23,8 +23,8 @@ void Window::Init(const WindowProps &props) {
 
   if (!s_GLFWInitialized) {
     // TODO: glfwTerminate on system shutdown
-    int isInitialized = glfwInit();
-    TX_ASSERT(isInitialized, "Could not intialize GLFW!");
+    int glfwInitialized = glfwInit();
+    TX_ASSERT(glfwInitialized, "Failed to intialize GLFW!");
 
     s_GLFWInitialized = true;
   }
@@ -32,6 +32,10 @@ void Window::Init(const WindowProps &props) {
   m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(),
                               nullptr, nullptr);
   glfwMakeContextCurrent(m_Window);
+
+  int gladInitialized = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+  TX_ASSERT(gladInitialized, "Failed to intialize GLAD!")
+
   glfwSetWindowUserPointer(m_Window, &m_Data);
   SetVSync(true);
 

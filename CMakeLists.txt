@@ -37,23 +37,26 @@ set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 
 # Includes
 target_include_directories(${PROJECT_NAME}
-  PUBLIC ./libs/spdlog/include
-  PUBLIC ./libs/glfw/include
   PUBLIC ./libs/debugbreak
+  PUBLIC ./libs/glad/include
+  PUBLIC ./libs/glfw/include
+  PUBLIC ./libs/spdlog/include
   PRIVATE ./src
 )
 
 # External Libraries
-add_subdirectory(./libs/spdlog)
+add_subdirectory(./libs/glad)
 add_subdirectory(./libs/glfw)
+add_subdirectory(./libs/spdlog)
+
+# Linking
+target_link_libraries(${PROJECT_NAME}
+  glad
+  glfw
+  spdlog
+)
 
 # Precompiled Headers
 target_precompile_headers(${PROJECT_NAME}
   PRIVATE ./src/txpch.hpp
-)
-
-# Linking
-target_link_libraries(${PROJECT_NAME}
-  spdlog
-  glfw
 )
