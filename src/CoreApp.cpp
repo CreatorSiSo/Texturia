@@ -18,15 +18,28 @@ CoreApp::~CoreApp() {}
 
 void CoreApp::Run() {
   while (m_Running) {
+    for (Layer *layer : m_LayerStack)
+      layer->OnUpdate();
+
     m_Window->OnUpdate();
   }
 }
+
+void CoreApp::PushLayer(Layer *layer) { m_LayerStack.PushLayer(layer); }
+
+void CoreApp::PushOverlay(Layer *overlay) { m_LayerStack.PushOverlay(overlay); }
 
 void CoreApp::OnEvent(Event &e) {
   EventDispatcher dispatcher(e);
   dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 
   TX_TRACE("{0}", e);
+
+  for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();) {
+    (*--it)->OnEvent(e);
+    if (e.Handled)
+      break;
+  }
 }
 
 bool CoreApp::OnWindowClose(WindowCloseEvent &e) {

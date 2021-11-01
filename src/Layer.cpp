@@ -1,6 +1,6 @@
 #include "txpch.hpp"
 
-#include "Layer.h"
+#include "Layer.hpp"
 
 namespace Texturia {
 
@@ -10,6 +10,6 @@ Layer::~Layer() {}
 void Layer::OnAttach() {}
 void Layer::OnDetach() {}
 void Layer::OnUpdate() {}
-void Layer::OnEvent() {}
+void Layer::OnEvent(Event &e) {}
 
 } // namespace Texturia

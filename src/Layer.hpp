@@ -2,6 +2,8 @@
 
 #include "txpch.hpp"
 
+#include "Events/Event.hpp"
+
 namespace Texturia {
 
 class Layer {
@@ -12,7 +14,7 @@ public:
   virtual void OnAttach();
   virtual void OnDetach();
   virtual void OnUpdate();
-  virtual void OnEvent();
+  virtual void OnEvent(Event &e);
 
 private:
   std::string m_DebugName;

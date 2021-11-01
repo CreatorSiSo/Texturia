@@ -1,6 +1,6 @@
 #include "txpch.hpp"
 
-#include "LayerStack.h"
+#include "LayerStack.hpp"
 
 namespace Texturia {
 
