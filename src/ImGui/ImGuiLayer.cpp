@@ -17,7 +17,6 @@ ImGuiLayer::~ImGuiLayer() {}
 
 void ImGuiLayer::OnAttach() {
   ImGui::CreateContext();
-  ImGui::StyleColorsDark();
 
   ImGuiIO &io = ImGui::GetIO();
   io.BackendFlags = ImGuiBackendFlags_HasMouseCursors;
@@ -48,9 +47,34 @@ void ImGuiLayer::OnAttach() {
   io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
   ImGui_ImplOpenGL3_Init("#version 410");
+
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigDockingTransparentPayload = true;
+
+  ImFontConfig fontConfig;
+  fontConfig.OversampleH = 1;
+  fontConfig.OversampleH = 1;
+  fontConfig.PixelSnapH = true;
+  fontConfig.MergeMode = true;
+
+  io.Fonts->AddFontFromFileTTF("./assets/fonts/Comfortaa/Comfortaa-Regular.ttf",
+                               14.0f);
+
+  ImGuiStyle &style = ImGui::GetStyle();
+  style.WindowRounding = 5;
+  style.ChildRounding = 3;
+  style.FrameRounding = 3;
+  style.PopupRounding = 3;
+  style.ScrollbarRounding = 9;
+  style.GrabRounding = 3;
+  style.TabRounding = 3;
+
 }
 
-void ImGuiLayer::OnDetach() {}
+void ImGuiLayer::OnDetach() {
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui::DestroyContext();
+}
 
 void ImGuiLayer::OnUpdate() {
   ImGuiIO &io = ImGui::GetIO();

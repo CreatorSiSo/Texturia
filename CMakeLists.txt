@@ -37,6 +37,12 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 
+#Pre Build
+add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory
+                       ${CMAKE_SOURCE_DIR}/assets ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)
+
+
 # Includes
 target_include_directories(${PROJECT_NAME}
   PUBLIC ./libs/debugbreak
