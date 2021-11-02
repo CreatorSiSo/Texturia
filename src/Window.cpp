@@ -77,6 +77,12 @@ void Window::Init(const WindowProps &props) {
     }
   });
 
+  glfwSetCharCallback(m_Window, [](GLFWwindow *window, unsigned int keycode) {
+    WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
+    KeyTypedEvent e(keycode);
+    data.EventCallback(e);
+  });
+
   glfwSetMouseButtonCallback(
       m_Window, [](GLFWwindow *window, int button, int action, int mods) {
         WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
@@ -98,7 +104,7 @@ void Window::Init(const WindowProps &props) {
       m_Window, [](GLFWwindow *window, double xOffset, double yOffset) {
         WindowData &data = *(WindowData *)glfwGetWindowUserPointer(window);
 
-        MouseScrollEvent e((float)xOffset, (float)yOffset);
+        MouseScrolledEvent e((float)xOffset, (float)yOffset);
         data.EventCallback(e);
       });
 

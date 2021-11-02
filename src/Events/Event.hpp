@@ -21,6 +21,7 @@ enum class EventType {
   AppRender,
   KeyDown,
   KeyUp,
+  KeyTyped,
   MouseButtonDown,
   MouseButtonUp,
   MouseMoved,

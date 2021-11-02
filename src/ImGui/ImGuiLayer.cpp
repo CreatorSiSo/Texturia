@@ -1,6 +1,9 @@
 #include "txpch.hpp"
 
-#include "GLFW/glfw3.h"
+//! Temporary
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+
 #include "imgui.h"
 
 #include "CoreApp.hpp"
@@ -68,6 +71,101 @@ void ImGuiLayer::OnUpdate() {
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGuiLayer::OnEvent(Event &e) {}
+void ImGuiLayer::OnEvent(Event &e) {
+  EventDispatcher dispatcher(e);
+
+  dispatcher.Dispatch<KeyDownEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnKeyDownEvent));
+
+  dispatcher.Dispatch<KeyTypedEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
+
+  dispatcher.Dispatch<KeyUpEvent>(TX_BIND_EVENT_FN(ImGuiLayer::OnKeyUpEvent));
+
+  dispatcher.Dispatch<MouseButtonDownEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonDownEvent));
+
+  dispatcher.Dispatch<MouseButtonUpEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonUpEvent));
+
+  dispatcher.Dispatch<MouseMovedEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
+
+  dispatcher.Dispatch<MouseScrolledEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
+
+  dispatcher.Dispatch<WindowResizeEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnWindowResizedEvent));
+
+  dispatcher.Dispatch<WindowCloseEvent>(
+      TX_BIND_EVENT_FN(ImGuiLayer::OnWindowCloseEvent));
+}
+
+bool ImGuiLayer::OnKeyDownEvent(KeyDownEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.KeysDown[e.GetKeyCode()] = true;
+
+  io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+  io.KeyCtrl =
+      io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+  io.KeyShift =
+      io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+  io.KeySuper =
+      io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+  return false;
+}
+
+bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  unsigned int keycode = e.GetKeyCode();
+  io.AddInputCharacter(keycode);
+  return false;
+}
+
+bool ImGuiLayer::OnKeyUpEvent(KeyUpEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.KeysDown[e.GetKeyCode()] = false;
+  return false;
+}
+
+bool ImGuiLayer::OnMouseButtonDownEvent(MouseButtonDownEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.MouseDown[e.GetMouseButton()] = true;
+  return false;
+}
+
+bool ImGuiLayer::OnMouseButtonUpEvent(MouseButtonUpEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.MouseDown[e.GetMouseButton()] = false;
+  return false;
+}
+
+bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.MousePos = ImVec2(e.GetX(), e.GetY());
+  return false;
+}
+
+bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.MouseWheel += e.GetOffsetY();
+  io.MouseWheelH += e.GetOffsetX();
+  return false;
+}
+
+bool ImGuiLayer::OnWindowResizedEvent(WindowResizeEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  io.DisplaySize = ImVec2(e.GetWidth(), e.GetWidth());
+  io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+  //! Temporary
+  glViewport(0, 0, e.GetWidth(), e.GetWidth());
+  return false;
+}
+
+bool ImGuiLayer::OnWindowCloseEvent(WindowCloseEvent &e) {
+  ImGuiIO &io = ImGui::GetIO();
+  return false;
+}
 
 } // namespace Texturia

@@ -5,8 +5,6 @@
 
 namespace Texturia {
 
-#define BIND_EVENT_FN(x) std::bind(&CoreApp::x, this, std::placeholders::_1)
-
 CoreApp *CoreApp::s_Instance = nullptr;
 
 CoreApp::CoreApp() {
@@ -17,7 +15,7 @@ CoreApp::CoreApp() {
   TX_INFO("Initialized Logger");
 
   m_Window = std::unique_ptr<Window>(Window::Create());
-  m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+  m_Window->SetEventCallback(TX_BIND_EVENT_FN(CoreApp::OnEvent));
 
   PushOverlay(new ImGuiLayer());
 }
@@ -48,7 +46,8 @@ void CoreApp::PushOverlay(Layer *overlay) {
 
 void CoreApp::OnEvent(Event &e) {
   EventDispatcher dispatcher(e);
-  dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+  dispatcher.Dispatch<WindowCloseEvent>(
+      TX_BIND_EVENT_FN(CoreApp::OnWindowClose));
 
   TX_TRACE("{0}", e);
 

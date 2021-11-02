@@ -26,17 +26,16 @@ private:
   float m_MouseX, m_MouseY;
 };
 
-class MouseScrollEvent : public Event {
+class MouseScrolledEvent : public Event {
 public:
-  MouseScrollEvent(float offsetX, float offsetY)
-      : m_OffsetX(offsetX), m_OffsetY(offsetX) {}
+  MouseScrolledEvent(float x, float y) : m_OffsetX(x), m_OffsetY(y) {}
 
-  inline float GetOffsetY() const { return m_OffsetY; }
   inline float GetOffsetX() const { return m_OffsetX; }
+  inline float GetOffsetY() const { return m_OffsetY; }
 
   std::string ToString() const override {
     std::stringstream ss;
-    ss << "MouseScrollEvent: " << GetOffsetX() << ", " << GetOffsetY();
+    ss << "MouseScrolledEvent: " << GetOffsetX() << ", " << GetOffsetY();
     return ss.str();
   }
 
