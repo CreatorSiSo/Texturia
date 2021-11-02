@@ -28,8 +28,8 @@ set(SOURCES
   ./src/LayerStack.cpp
   ./src/Log.cpp
   ./src/Main.cpp
-  ./src/Window.cpp
   ./src/ImGui/ImGuiLayer.cpp
+  ./src/Platforms/Linux/LinuxWindow.cpp
   ./src/Platforms/OpenGL/ImGuiOpenGL3Renderer.cpp
 )
 

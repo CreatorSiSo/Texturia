@@ -1,22 +1,26 @@
 #include "txpch.hpp"
 
-#include "Window.hpp"
+#include "LinuxWindow.hpp"
 
 namespace Texturia {
 
 static bool s_GLFWInitialized = false;
 
-Window::Window(const WindowProps &props) { Init(props); }
-Window::~Window() { Shutdown(); }
+static void GLFWErrorCallbackFunction(int error, const char *description) {
+  TX_ERROR("{0} {1}", error, (std::string)description);
+}
 
-Window *Window::Create(const WindowProps &props) { return new Window(props); }
+LinuxWindow::LinuxWindow(const WindowProps &props) { Init(props); }
+LinuxWindow::~LinuxWindow() { Shutdown(); }
 
-void Window::Init(const WindowProps &props) {
+Window *Window::Create(const WindowProps &props) {
+  return new LinuxWindow(props);
+}
+
+void LinuxWindow::Init(const WindowProps &props) {
   m_Data.Title = props.Title;
   m_Data.Width = props.Width;
   m_Data.Height = props.Height;
-
-  glfwSetErrorCallback(ErrorCallbackFunction);
 
   TX_INFO("Creating Window '{0}' ({1}, {2})", m_Data.Title, m_Data.Width,
           m_Data.Height);
@@ -25,7 +29,7 @@ void Window::Init(const WindowProps &props) {
     // TODO: glfwTerminate on system shutdown
     int glfwInitialized = glfwInit();
     TX_ASSERT(glfwInitialized, "Failed to intialize GLFW!");
-
+    glfwSetErrorCallback(GLFWErrorCallbackFunction);
     s_GLFWInitialized = true;
   }
 
@@ -117,21 +121,17 @@ void Window::Init(const WindowProps &props) {
       });
 }
 
-void Window::Shutdown() { glfwTerminate(); }
+void LinuxWindow::Shutdown() { glfwTerminate(); }
 
-unsigned int Window::GetWidth() const { return m_Data.Width; }
-unsigned int Window::GetHeight() const { return m_Data.Height; }
+unsigned int LinuxWindow::GetWidth() const { return m_Data.Width; }
+unsigned int LinuxWindow::GetHeight() const { return m_Data.Height; }
 
-void Window::OnUpdate() {
+void LinuxWindow::OnUpdate() {
   glfwPollEvents();
   glfwSwapBuffers(m_Window);
 }
 
-inline void Window::SetEventCallback(const EventCallbackFunction &callback) {
-  m_Data.EventCallback = callback;
-}
-
-void Window::SetVSync(bool use) {
+void LinuxWindow::SetVSync(bool use) {
   if (use)
     glfwSwapInterval(1);
   else
@@ -140,6 +140,6 @@ void Window::SetVSync(bool use) {
   m_Data.VSync = use;
 }
 
-bool Window::IsVSync() const { return m_Data.VSync; }
+bool LinuxWindow::IsVSync() const { return m_Data.VSync; }
 
 } // namespace Texturia

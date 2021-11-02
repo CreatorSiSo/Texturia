@@ -1,5 +1,7 @@
 #include "txpch.hpp"
 
+#include <glad/glad.h>
+
 #include "CoreApp.hpp"
 #include "ImGui/ImGuiLayer.hpp"
 
@@ -8,11 +10,11 @@ namespace Texturia {
 CoreApp *CoreApp::s_Instance = nullptr;
 
 CoreApp::CoreApp() {
-  TX_ASSERT(!s_Instance, "CoreApp already exists!");
-  s_Instance = this;
-
   Log::Init();
   TX_INFO("Initialized Logger");
+
+  TX_ASSERT(!s_Instance, "CoreApp already exists!");
+  s_Instance = this;
 
   m_Window = std::unique_ptr<Window>(Window::Create());
   m_Window->SetEventCallback(TX_BIND_EVENT_FN(CoreApp::OnEvent));

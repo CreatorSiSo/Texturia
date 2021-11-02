@@ -2,14 +2,7 @@
 
 #include "txpch.hpp"
 
-#include <glad/glad.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
-#include "Events/AppEvent.hpp"
 #include "Events/Event.hpp"
-#include "Events/KeyEvent.hpp"
-#include "Events/MouseEvent.hpp"
 
 namespace Texturia {
 
@@ -23,47 +16,23 @@ struct WindowProps {
       : Title(title), Width(width), Height(height) {}
 };
 
-void ErrorCallbackFunction(int error, const char *description) {
-  TX_ERROR("{0} {1}", error, (std::string)description);
-}
-
 class Window {
 public:
-  Window(const WindowProps &props);
-  ~Window();
+  virtual ~Window() {}
 
-  static Window *Create(const WindowProps &props = WindowProps());
+  virtual void OnUpdate() = 0;
 
-  void OnUpdate();
-
-  unsigned int GetWidth() const;
-  unsigned int GetHeight() const;
+  virtual unsigned int GetWidth() const = 0;
+  virtual unsigned int GetHeight() const = 0;
 
   using EventCallbackFunction = std::function<void(Event &)>;
 
   // Window attributes
-  void SetEventCallback(const EventCallbackFunction &callback);
-  void SetVSync(bool enabled);
-  bool IsVSync() const;
+  virtual void SetEventCallback(const EventCallbackFunction &callback) = 0;
+  virtual void SetVSync(bool enabled) = 0;
+  virtual bool IsVSync() const = 0;
 
-private:
-  GLFWwindow *m_Window;
-
-  void Init(const WindowProps &props);
-  void Shutdown();
-
-  void OnEvent(Event &e);
-  bool OnWindowClose(WindowCloseEvent &e);
-
-  struct WindowData {
-    std::string Title;
-    unsigned int Width, Height;
-    bool VSync;
-
-    EventCallbackFunction EventCallback;
-  };
-
-  WindowData m_Data;
+  static Window *Create(const WindowProps &props = WindowProps());
 };
 
 } // namespace Texturia
