@@ -36,8 +36,16 @@ set(SOURCES
     ./src/Platforms/Linux/LinuxWindow.cpp
     ./src/Platforms/OpenGL/ImGuiOpenGL3Renderer.cpp)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  set(PLATFORM_SOURCES ./src/Platforms/Linux/LinuxWindow.cpp)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(PLATFORM_SOURCES ./src/Platforms/MacOS/MacOSWindow.cpp)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  set(PLATFORM_SOURCES ./src/Platforms/Windows/WindowsWindow.cpp)
+endif()
+
 # Targets
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${PLATFORM_SOURCES})
 set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 
 # Crossplatform Compiler Defines/Options
