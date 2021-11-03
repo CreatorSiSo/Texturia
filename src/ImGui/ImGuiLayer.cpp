@@ -170,6 +170,17 @@ void ImGuiLayer::OnUpdate() {
   ImGui::MenuItem("Edit");
   ImGui::MenuItem("View");
   ImGui::MenuItem("Help");
+
+#ifdef TX_PLATFORM_WINDOWS
+  ImGui::MenuItem("Windows");
+#endif
+#ifdef TX_PLATFORM_LINUX
+  ImGui::MenuItem("Linux");
+#endif
+#ifdef TX_PLATFORM_MACOS
+  ImGui::MenuItem("MacOS");
+#endif
+
   ImGui::EndMainMenuBar();
 
   ImGui::ShowDemoWindow();
