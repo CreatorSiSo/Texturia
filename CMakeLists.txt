@@ -33,15 +33,17 @@ set(SOURCES
     ./src/Log.cpp
     ./src/Main.cpp
     ./src/ImGui/ImGuiLayer.cpp
-    ./src/Platforms/Linux/LinuxWindow.cpp
     ./src/Platforms/OpenGL/ImGuiOpenGL3Renderer.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(PLATFORM_SOURCES ./src/Platforms/Linux/LinuxWindow.cpp)
+  set(PLATFORM_SOURCES ./src/Platforms/Windows/WindowsInput.cpp
+                       ./src/Platforms/Windows/WindowsWindow.cpp)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(PLATFORM_SOURCES ./src/Platforms/MacOS/MacOSWindow.cpp)
+  set(PLATFORM_SOURCES ./src/Platforms/Linux/LinuxInput.cpp
+                       ./src/Platforms/Linux/LinuxWindow.cpp)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(PLATFORM_SOURCES ./src/Platforms/Windows/WindowsWindow.cpp)
+  set(PLATFORM_SOURCES ./src/Platforms/MacOS/MacOSInput.cpp
+                       ./src/Platforms/MacOS/MacOSWindow.cpp)
 endif()
 
 # Targets
