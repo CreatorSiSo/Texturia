@@ -28,9 +28,6 @@ CoreApp::~CoreApp() {}
 
 void CoreApp::Run() {
   while (m_Running) {
-    auto [x, y] = Input::GetMousePos();
-    TX_TRACE("{0}, {1}", x, y);
-
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 

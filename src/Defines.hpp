@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Input/KeyCodes.hpp"
+#include "Input/MouseButtonCodes.hpp"
+
 // #ifdef TX_ENABLE_ASSERTS
 #define TX_ASSERT(x, ...)                                                      \
   {                                                                            \
