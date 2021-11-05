@@ -116,8 +116,8 @@
 
 #include "txpch.hpp"
 
-#include "glad/glad.h"
-#include "imgui.h"
+#include <glad/glad.h>
+#include <imgui.h>
 
 #include "ImGuiOpenGL3Renderer.hpp"
 

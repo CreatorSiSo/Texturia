@@ -2,7 +2,7 @@
 
 #include "txpch.hpp"
 
-#include "Input.hpp"
+#include "Input/Input.hpp"
 
 namespace Texturia {
 

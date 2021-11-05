@@ -1,5 +1,7 @@
 #include "txpch.hpp"
 
+#include <glad/glad.h>
+
 #include "MacOSWindow.hpp"
 
 namespace Texturia {

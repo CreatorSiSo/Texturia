@@ -1,5 +1,9 @@
 #pragma once
 
+/* Defines/Config */
+#include "Defines.hpp"
+
+/* Standard */
 #include <algorithm>
 #include <functional>
 #include <iostream>
@@ -13,9 +17,8 @@
 #include <unordered_set>
 #include <vector>
 
-#include "Config.hpp"
-#include "debugbreak.h"
+/* External */
+#include <debugbreak.h>
 
+/* Internal */
 #include "Log.hpp"
-
-#define IMGUI_IMPL_OPENGL_LOADER_GLAD
