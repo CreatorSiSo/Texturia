@@ -74,6 +74,7 @@ target_include_directories(
   PRIVATE ./libs/debugbreak
   PRIVATE ./libs/glad/include
   PRIVATE ./libs/glfw/include
+  PRIVATE ./libs/glm
   PRIVATE ./libs/imgui
   PRIVATE ./libs/spdlog/include
   PRIVATE ./src)
@@ -81,11 +82,12 @@ target_include_directories(
 # External Libraries
 add_subdirectory(./libs/glad)
 add_subdirectory(./libs/glfw)
+add_subdirectory(./libs/glm)
 add_subdirectory(./libs/imgui)
 add_subdirectory(./libs/spdlog)
 
 # Linking
-target_link_libraries(${PROJECT_NAME} glad glfw imgui spdlog)
+target_link_libraries(${PROJECT_NAME} glad glfw glm imgui spdlog)
 
 # Precompiled Headers
 target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
