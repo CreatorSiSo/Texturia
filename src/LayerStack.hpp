@@ -21,7 +21,7 @@ public:
 
 private:
   std::vector<Layer *> m_Layers;
-  std::vector<Layer *>::iterator m_layerInsert;
+  unsigned int m_layerInsertIndex = 0;
 };
 
 } // namespace Texturia

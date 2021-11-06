@@ -10,6 +10,7 @@ Layer::~Layer() {}
 void Layer::OnAttach() {}
 void Layer::OnDetach() {}
 void Layer::OnUpdate() {}
+void Layer::OnImGuiRender() {}
 void Layer::OnEvent(Event &e) {}
 
 } // namespace Texturia

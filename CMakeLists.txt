@@ -32,8 +32,8 @@ set(SOURCES
     ./src/LayerStack.cpp
     ./src/Log.cpp
     ./src/Main.cpp
-    ./src/ImGui/ImGuiLayer.cpp
-    ./src/Platforms/OpenGL/ImGuiOpenGL3Renderer.cpp)
+    ./src/ImGui/ImGuiBuild.cpp
+    ./src/ImGui/ImGuiLayer.cpp)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   set(PLATFORM_SOURCES ./src/Platforms/Windows/WindowsInput.cpp
@@ -53,10 +53,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
 # Crossplatform Compiler Defines/Options
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   add_compile_definitions(TX_PLATFORM_WINDOWS)
-  target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+  # target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   add_compile_definitions(TX_PLATFORM_LINUX)
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+  # target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   add_compile_definitions(TX_PLATFORM_MACOS)
 endif()

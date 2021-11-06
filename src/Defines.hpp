@@ -22,3 +22,5 @@
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #define GLFW_INCLUDE_NONE
+
+#define TX_GLSL_VERSION "#version 410"

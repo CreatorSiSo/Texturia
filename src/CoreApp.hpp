@@ -4,8 +4,7 @@
 
 #include "Events/AppEvent.hpp"
 #include "Events/Event.hpp"
-#include "Events/KeyEvent.hpp"
-#include "Events/MouseEvent.hpp"
+#include "ImGui/ImGuiLayer.hpp"
 #include "LayerStack.hpp"
 #include "Window.hpp"
 
@@ -31,7 +30,10 @@ private:
 
   static CoreApp *s_Instance;
   std::unique_ptr<Window> m_Window;
+
   LayerStack m_LayerStack;
+  ImGuiLayer *m_ImGuiLayer;
+
   bool m_Running = true;
 };
 

@@ -21,18 +21,24 @@ CoreApp::CoreApp() {
   m_Window = std::unique_ptr<Window>(Window::Create());
   m_Window->SetEventCallback(TX_BIND_EVENT_FN(CoreApp::OnEvent));
 
-  PushOverlay(new ImGuiLayer());
+  m_ImGuiLayer = new ImGuiLayer();
+  PushOverlay(m_ImGuiLayer);
 }
 
 CoreApp::~CoreApp() {}
 
 void CoreApp::Run() {
   while (m_Running) {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     for (Layer *layer : m_LayerStack)
       layer->OnUpdate();
+
+    m_ImGuiLayer->Begin();
+    for (Layer *layer : m_LayerStack)
+      m_ImGuiLayer->OnImGuiRender();
+    m_ImGuiLayer->End();
 
     m_Window->OnUpdate();
   }

@@ -8,7 +8,8 @@
 
 #include "CoreApp.hpp"
 #include "ImGuiLayer.hpp"
-#include "Platforms/OpenGL/ImGuiOpenGL3Renderer.hpp"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
 namespace Texturia {
 
@@ -16,55 +17,23 @@ ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 ImGuiLayer::~ImGuiLayer() {}
 
 void ImGuiLayer::OnAttach() {
+  IMGUI_CHECKVERSION();
   ImGui::CreateContext();
-
   ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  // io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+  io.ConfigViewportsNoAutoMerge = true;
+  // io.ConfigViewportsNoTaskBarIcon = true;
+  io.ConfigWindowsResizeFromEdges = true;
+  io.ConfigFlags |= ImGuiDockNodeFlags_PassthruCentralNode;
+
   io.BackendFlags = ImGuiBackendFlags_HasMouseCursors;
   io.BackendFlags = ImGuiBackendFlags_HasSetMousePos;
 
-  // Temporary should eventually use internal key codes
-  io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-  io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-  io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-  io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-  io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-  io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-  io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-  io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-  io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-  io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-  io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-  io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-  io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-  io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-  io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-  io.KeyMap[ImGuiKey_KeyPadEnter] = GLFW_KEY_KP_ENTER;
-  io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-  io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-  io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-  io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-  io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-  io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-  ImGui_ImplOpenGL3_Init("#version 410");
-
-  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-  io.ConfigDockingTransparentPayload = true;
-
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-
-  // Needs io.BackendFlags & ImGuiBackendFlags_HasMouseCursors
-  io.ConfigWindowsResizeFromEdges = true;
-
-  ImFontConfig fontConfig;
-  fontConfig.OversampleH = 1;
-  fontConfig.OversampleH = 1;
-  fontConfig.PixelSnapH = true;
-  fontConfig.MergeMode = true;
-
-  io.Fonts->AddFontFromFileTTF("./assets/fonts/Comfortaa/Comfortaa-Regular.ttf",
-                               14.0f);
-
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
   ImGuiStyle &style = ImGui::GetStyle();
   // style.WindowPadding = ImVec2(8.00f, 8.00f);
   // style.FramePadding = ImVec2(5.00f, 2.00f);
@@ -75,7 +44,7 @@ void ImGuiLayer::OnAttach() {
   // style.IndentSpacing = 25;
   // style.ScrollbarSize = 15;
   // style.GrabMinSize = 10;
-  // style.WindowBorderSize = 1;
+  style.WindowBorderSize = 0;
   // style.ChildBorderSize = 1;
   // style.PopupBorderSize = 1;
   // style.FrameBorderSize = 1;
@@ -89,9 +58,10 @@ void ImGuiLayer::OnAttach() {
   style.TabRounding = 3;
 
   ImVec4 *colors = ImGui::GetStyle().Colors;
+  colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.07f, 0.07f, 0.07f, 1.0f);
   // colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
   // colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-  // colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.10f, 1.00f);
+  colors[ImGuiCol_WindowBg] = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
   // colors[ImGuiCol_ChildBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
   // colors[ImGuiCol_PopupBg] = ImVec4(0.19f, 0.19f, 0.19f, 0.92f);
   // colors[ImGuiCol_Border] = ImVec4(0.19f, 0.19f, 0.19f, 0.29f);
@@ -145,144 +115,99 @@ void ImGuiLayer::OnAttach() {
   // 0.70f); colors[ImGuiCol_NavWindowingDimBg] = ImVec4(1.00f, 0.00f, 0.00f,
   // 0.20f); colors[ImGuiCol_ModalWindowDimBg] = ImVec4(1.00f, 0.00f, 0.00f,
   // 0.35f);
+
+  // Setup Platform/Renderer backends
+  CoreApp &app = CoreApp::GetCoreApp();
+  GLFWwindow *window =
+      static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init(TX_GLSL_VERSION);
+
+  ImFontConfig fontConfig;
+  fontConfig.OversampleH = 1;
+  fontConfig.OversampleH = 1;
+  fontConfig.PixelSnapH = true;
+  fontConfig.MergeMode = true;
+
+  // TODO Use dpi for font size and dont hardcode it!!
+  // https://github.com/ocornut/imgui/blob/master/docs/FAQ.md#q-how-should-i-handle-dpi-in-my-application
+  ImFont *font = io.Fonts->AddFontFromFileTTF(
+      "./assets/fonts/Comfortaa/Comfortaa-Regular.ttf", 14.0f);
+  TX_ASSERT(font != NULL, "Could not load font Comfortaa-Regular!");
 }
 
 void ImGuiLayer::OnDetach() {
   ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 }
 
-void ImGuiLayer::OnUpdate() {
-  ImGuiIO &io = ImGui::GetIO();
-  CoreApp &coreApp = CoreApp::GetCoreApp();
-  io.DisplaySize =
-      ImVec2(coreApp.GetWindow().GetWidth(), coreApp.GetWindow().GetHeight());
-
-  float time = (float)glfwGetTime();
-  io.DeltaTime = m_Time > 0.0f ? (time - m_Time) : (1.0f / 60.0f);
-
+void ImGuiLayer::Begin() {
   ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
+}
 
-  ImGui::BeginMainMenuBar();
-  ImGui::MenuItem("File");
-  ImGui::MenuItem("Edit");
-  ImGui::MenuItem("View");
-  ImGui::MenuItem("Help");
-
-#ifdef TX_PLATFORM_WINDOWS
-  ImGui::MenuItem("Windows");
-#endif
-#ifdef TX_PLATFORM_LINUX
-  ImGui::MenuItem("Linux");
-#endif
-#ifdef TX_PLATFORM_MACOS
-  ImGui::MenuItem("MacOS");
-#endif
-
-  ImGui::EndMainMenuBar();
-
-  ImGui::ShowDemoWindow();
+void ImGuiLayer::End() {
+  ImGuiIO &io = ImGui::GetIO();
+  CoreApp &app = CoreApp::GetCoreApp();
+  io.DisplaySize =
+      ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    GLFWwindow *backupCurrentContext = glfwGetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    glfwMakeContextCurrent(backupCurrentContext);
+  }
 }
 
-void ImGuiLayer::OnEvent(Event &e) {
-  EventDispatcher dispatcher(e);
+void ImGuiLayer::OnImGuiRender() {
+  static bool test = false;
 
-  dispatcher.Dispatch<KeyDownEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnKeyDownEvent));
+  ImGui::DockSpaceOverViewport();
 
-  dispatcher.Dispatch<KeyTypedEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnKeyTypedEvent));
+  if (ImGui::BeginMainMenuBar()) {
+    if (ImGui::BeginMenu("File")) {
+      ImGui::MenuItem("1");
+      ImGui::EndMenu();
+    }
 
-  dispatcher.Dispatch<KeyUpEvent>(TX_BIND_EVENT_FN(ImGuiLayer::OnKeyUpEvent));
+    if (ImGui::BeginMenu("Edit")) {
+      ImGui::MenuItem("1");
+      ImGui::EndMenu();
+    }
 
-  dispatcher.Dispatch<MouseButtonDownEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonDownEvent));
+    if (ImGui::BeginMenu("View")) {
+      ImGui::MenuItem("1");
+      ImGui::EndMenu();
+    }
 
-  dispatcher.Dispatch<MouseButtonUpEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseButtonUpEvent));
+    if (ImGui::BeginMenu("Help")) {
+      ImGui::MenuItem("1");
+      ImGui::EndMenu();
+    }
 
-  dispatcher.Dispatch<MouseMovedEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseMovedEvent));
+    if (ImGui::BeginMenu("Platform")) {
+#ifdef TX_PLATFORM_WINDOWS
+      ImGui::MenuItem("Windows");
+#endif
+#ifdef TX_PLATFORM_LINUX
+      ImGui::MenuItem("Linux");
+#endif
+#ifdef TX_PLATFORM_MACOS
+      ImGui::MenuItem("MacOS");
+#endif
+      ImGui::EndMenu();
+    }
 
-  dispatcher.Dispatch<MouseScrolledEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnMouseScrolledEvent));
+    ImGui::EndMainMenuBar();
+  }
 
-  dispatcher.Dispatch<WindowResizeEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnWindowResizedEvent));
-
-  dispatcher.Dispatch<WindowCloseEvent>(
-      TX_BIND_EVENT_FN(ImGuiLayer::OnWindowCloseEvent));
-}
-
-bool ImGuiLayer::OnKeyDownEvent(KeyDownEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.KeysDown[e.GetKeyCode()] = true;
-
-  io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-  io.KeyCtrl =
-      io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-  io.KeyShift =
-      io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-  io.KeySuper =
-      io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-
-  return false;
-}
-
-bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  unsigned int keycode = e.GetKeyCode();
-  io.AddInputCharacter(keycode);
-  return false;
-}
-
-bool ImGuiLayer::OnKeyUpEvent(KeyUpEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.KeysDown[e.GetKeyCode()] = false;
-  return false;
-}
-
-bool ImGuiLayer::OnMouseButtonDownEvent(MouseButtonDownEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.MouseDown[e.GetMouseButton()] = true;
-  return false;
-}
-
-bool ImGuiLayer::OnMouseButtonUpEvent(MouseButtonUpEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.MouseDown[e.GetMouseButton()] = false;
-  return false;
-}
-
-bool ImGuiLayer::OnMouseMovedEvent(MouseMovedEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.MousePos = ImVec2(e.GetX(), e.GetY());
-  return false;
-}
-
-bool ImGuiLayer::OnMouseScrolledEvent(MouseScrolledEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.MouseWheel += e.GetOffsetY();
-  io.MouseWheelH += e.GetOffsetX();
-  return false;
-}
-
-bool ImGuiLayer::OnWindowResizedEvent(WindowResizeEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  io.DisplaySize = ImVec2(e.GetWidth(), e.GetWidth());
-  io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-  //! Temporary
-  glViewport(0, 0, e.GetWidth(), e.GetWidth());
-  return false;
-}
-
-bool ImGuiLayer::OnWindowCloseEvent(WindowCloseEvent &e) {
-  ImGuiIO &io = ImGui::GetIO();
-  return false;
+  ImGui::ShowDemoWindow();
 }
 
 } // namespace Texturia
