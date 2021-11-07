@@ -15,7 +15,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # Project Setup
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 
 project(
   Texturia
@@ -26,26 +26,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin/${CMAKE_BUILD_TYPE})
 
 # Source Files
-set(SOURCES
-    ./src/CoreApp.cpp
-    ./src/Layer.cpp
-    ./src/LayerStack.cpp
-    ./src/Log.cpp
-    ./src/Main.cpp
-    ./src/Platforms/OpenGL/OpenGLContext.cpp
-    ./src/ImGui/ImGuiBuild.cpp
-    ./src/ImGui/ImGuiLayer.cpp)
+set(SOURCES ./src/Texturia.cpp)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(PLATFORM_SOURCES ./src/Platforms/Windows/WindowsInput.cpp
-                       ./src/Platforms/Windows/WindowsWindow.cpp)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(PLATFORM_SOURCES ./src/Platforms/Linux/LinuxInput.cpp
-                       ./src/Platforms/Linux/LinuxWindow.cpp)
-elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(PLATFORM_SOURCES ./src/Platforms/MacOS/MacOSInput.cpp
-                       ./src/Platforms/MacOS/MacOSWindow.cpp)
-endif()
 
 # Targets
 add_executable(${PROJECT_NAME} ${SOURCES} ${PLATFORM_SOURCES})
@@ -72,23 +54,17 @@ add_custom_command(
 # Includes
 target_include_directories(
   ${PROJECT_NAME}
-  PRIVATE ./libs/debugbreak
-  PRIVATE ./libs/glad/include
-  PRIVATE ./libs/glfw/include
-  PRIVATE ./libs/glm
-  PRIVATE ./libs/imgui
-  PRIVATE ./libs/spdlog/include
+  PRIVATE ./libs/framio/src
+  PRIVATE ./libs/framio/include
+  PRIVATE ./libs/framio/spdlog/include
+  PRIVATE ./libs/framio/glm/include
   PRIVATE ./src)
 
 # External Libraries
-add_subdirectory(./libs/glad)
-add_subdirectory(./libs/glfw)
-add_subdirectory(./libs/glm)
-add_subdirectory(./libs/imgui)
-add_subdirectory(./libs/spdlog)
+add_subdirectory(./libs/framio)
 
 # Linking
-target_link_libraries(${PROJECT_NAME} glad glfw glm imgui spdlog)
+target_link_libraries(${PROJECT_NAME} framio)
 
 # Precompiled Headers
-target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
+# target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
