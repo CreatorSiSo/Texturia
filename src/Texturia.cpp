@@ -1,8 +1,8 @@
-#include "framio/framio.hpp"
+#include "frameio/frameio.hpp"
 
 #include <imgui.h>
 
-class GuiLayer : public Framio::Layer {
+class GuiLayer : public Frameio::Layer {
 public:
   void OnImGuiRender() {
     ImGui::DockSpaceOverViewport();
@@ -47,18 +47,18 @@ public:
     ImGui::ShowDemoWindow();
   }
 
-  void OnEvent(Framio::Event &event) override {
-    if (event.GetEventType() == Framio::EventType::KeyTyped) {
-      Framio::KeyTypedEvent &e = (Framio::KeyTypedEvent &)event;
+  void OnEvent(Frameio::Event &event) override {
+    if (event.GetEventType() == Frameio::EventType::KeyTyped) {
+      Frameio::KeyTypedEvent &e = (Frameio::KeyTypedEvent &)event;
       FR_TRACE((char)e.GetKeyCode());
     }
   }
 };
 
-class TexturiaApp : public Framio::App {
+class TexturiaApp : public Frameio::App {
 public:
   TexturiaApp() { PushOverlay(new GuiLayer()); }
   ~TexturiaApp() {}
 };
 
-Framio::App *Framio::CreateApp() { return new TexturiaApp(); }
+Frameio::App *Frameio::CreateApp() { return new TexturiaApp(); }

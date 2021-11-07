@@ -54,17 +54,17 @@ add_custom_command(
 # Includes
 target_include_directories(
   ${PROJECT_NAME}
-  PRIVATE ./libs/framio/src
-  PRIVATE ./libs/framio/include
-  PRIVATE ./libs/framio/spdlog/include
-  PRIVATE ./libs/framio/glm/include
+  PRIVATE ./libs/frameio/src
+  PRIVATE ./libs/frameio/include
+  PRIVATE ./libs/frameio/spdlog/include
+  PRIVATE ./libs/frameio/glm/include
   PRIVATE ./src)
 
 # External Libraries
-add_subdirectory(./libs/framio)
+add_subdirectory(./libs/frameio)
 
 # Linking
-target_link_libraries(${PROJECT_NAME} framio)
+target_link_libraries(${PROJECT_NAME} frameio)
 
 # Precompiled Headers
 # target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
