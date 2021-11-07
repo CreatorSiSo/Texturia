@@ -8,6 +8,7 @@
 #include "Events/Event.hpp"
 #include "Events/KeyEvent.hpp"
 #include "Events/MouseEvent.hpp"
+#include "Platforms/OpenGL/OpenGLContext.hpp"
 #include "Window.hpp"
 
 namespace Texturia {
@@ -33,6 +34,7 @@ public:
 
 private:
   GLFWwindow *m_Window;
+  GraphicsContext *m_Context;
 
   virtual void Init(const WindowProps &props);
   virtual void Shutdown();

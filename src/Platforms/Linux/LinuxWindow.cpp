@@ -1,7 +1,5 @@
 #include "txpch.hpp"
 
-#include <glad/glad.h>
-
 #include "LinuxWindow.hpp"
 
 namespace Texturia {
@@ -37,10 +35,9 @@ void LinuxWindow::Init(const WindowProps &props) {
 
   m_Window = glfwCreateWindow(m_Data.Width, m_Data.Height, m_Data.Title.c_str(),
                               nullptr, nullptr);
-  glfwMakeContextCurrent(m_Window);
 
-  int gladInitialized = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-  TX_ASSERT(gladInitialized, "Failed to intialize GLAD!")
+  m_Context = new OpenGLContext(m_Window);
+  m_Context->Init();
 
   glfwSetWindowUserPointer(m_Window, &m_Data);
   SetVSync(true);
@@ -130,7 +127,7 @@ unsigned int LinuxWindow::GetHeight() const { return m_Data.Height; }
 
 void LinuxWindow::OnUpdate() {
   glfwPollEvents();
-  glfwSwapBuffers(m_Window);
+  m_Context->SwapBuffers();
 }
 
 void LinuxWindow::SetVSync(bool use) {

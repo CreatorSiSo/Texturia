@@ -32,6 +32,7 @@ set(SOURCES
     ./src/LayerStack.cpp
     ./src/Log.cpp
     ./src/Main.cpp
+    ./src/Platforms/OpenGL/OpenGLContext.cpp
     ./src/ImGui/ImGuiBuild.cpp
     ./src/ImGui/ImGuiLayer.cpp)
 
