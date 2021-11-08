@@ -58,7 +58,7 @@ public:
 class TexturiaApp : public Frameio::App {
 public:
   TexturiaApp() { PushOverlay(new GuiLayer()); }
-  ~TexturiaApp() {}
+  ~TexturiaApp() = default;
 };
 
 Frameio::App *Frameio::CreateApp() { return new TexturiaApp(); }
