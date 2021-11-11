@@ -4,7 +4,7 @@
 
 class GuiLayer : public Frameio::Layer {
 public:
-  void OnImGuiRender() {
+  void OnImGuiRender() override {
     ImGui::DockSpaceOverViewport();
 
     if (ImGui::BeginMainMenuBar()) {
