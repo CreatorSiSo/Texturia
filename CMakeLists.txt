@@ -44,13 +44,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   add_compile_definitions(TX_PLATFORM_MACOS)
 endif()
 
-# Pre Build
-add_custom_command(
-  TARGET ${PROJECT_NAME}
-  PRE_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets
-          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)
-
 # Includes
 target_include_directories(
   ${PROJECT_NAME}
@@ -68,3 +61,10 @@ target_link_libraries(${PROJECT_NAME} frameio)
 
 # Precompiled Headers
 # target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
+
+# Post Build
+add_custom_command(
+  TARGET ${PROJECT_NAME}
+  PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/assets
+          ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)

@@ -1,0 +1,33 @@
+{
+  "cmakeExecutable": "C:/Program Files/CMake/bin/cmake.exe",
+  "configurations": [
+    {
+      "name": "Debug",
+      "configurationType": "Debug",
+      "generator": "Ninja",
+      "buildRoot": "${workspaceRoot}/build",
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_CONFIGURATION_TYPES",
+          "value": "Debug",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "name": "Release",
+      "configurationType": "Release",
+      "generator": "Ninja",
+      "buildRoot": "${workspaceRoot}/build",
+      "inheritEnvironments": [],
+      "variables": [
+        {
+          "name": "CMAKE_CONFIGURATION_TYPES",
+          "value": "Release",
+          "type": "STRING"
+        }
+      ]
+    }
+  ]
+}
