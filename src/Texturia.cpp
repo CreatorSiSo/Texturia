@@ -8,7 +8,9 @@
 
 class GuiLayer : public Frameio::Layer {
 public:
-  GuiLayer() : Layer("Texturia: Gui"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f) {
+  GuiLayer()
+      : Layer("Texturia: Gui"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
+        m_CameraMoveDirection(0.0f) {
 
     // TRIANGLE
     m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
@@ -119,28 +121,33 @@ public:
   }
 
   void OnUpdate() override {
-    animTime++;
+    animationTime++;
 
     // clang-format off
-    glm::vec3 cameraMoveDirection = glm::rotateZ(
-      glm::vec3(0.0f, cameraSpeed, 0.0f),
+    m_CameraMoveDirection = glm::rotateZ(
+      glm::vec3(0.0f, m_CameraMoveSpeed, 0.0f),
       glm::pi<float>() - glm::orientedAngle(
         glm::normalize(glm::vec2(0.0f, 1.0f)),
         glm::normalize(glm::vec2(
-          Frameio::Input::GetMouseX() / 1280 /* m_Window->GetWidth() */ * 2 - 1,
+          // TODO Access window from layer
+          Frameio::Input::GetMouseX() /  1280 * 2 - 1,
           Frameio::Input::GetMouseY() / 720 /* m_Window->GetHeight( )*/ * 2 - 1)
         )
       )
     );
 
     if (Frameio::Input::IsKeyDown(FR_KEY_W))
-      m_Camera.SetPosition(m_Camera.GetPosition() + cameraMoveDirection);
+      m_Camera.SetPosition(m_Camera.GetPosition() + m_CameraMoveDirection);
+
     if (Frameio::Input::IsKeyDown(FR_KEY_A))
-      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(-cameraSpeed, 0.0f, 0.0f) /* glm::rotateZ(cameraMoveDirection, glm::half_pi<float>()) */);
+      m_Camera
+          .SetPosition(m_Camera.GetPosition() + glm::vec3(-m_CameraMoveSpeed, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, glm::half_pi<float>()) */);
+
     if (Frameio::Input::IsKeyDown(FR_KEY_S))
-      m_Camera.SetPosition(m_Camera.GetPosition() + glm::rotateZ(cameraMoveDirection, glm::pi<float>()));
+      m_Camera.SetPosition(m_Camera.GetPosition() + glm::rotateZ(m_CameraMoveDirection, glm::pi<float>()));
+
     if (Frameio::Input::IsKeyDown(FR_KEY_D))
-      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(cameraSpeed, 0.0f, 0.0f) /* glm::rotateZ(cameraMoveDirection, -glm::half_pi<float>()) */);
+      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(m_CameraMoveSpeed, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, -glm::half_pi<float>()) */);
     // clang-format on
 
     // m_Camera.SetRotation(glm::degrees(glm::orientedAngle(
@@ -148,7 +155,7 @@ public:
     //     glm::normalize(glm::vec2(Input::GetMouseX() / 1280 * 2 - 1,
     //                              Input::GetMouseY() / 720 * 2 - 1)))));
 
-    m_Camera.SetRotation(glm::sin(animTime / 16));
+    m_Camera.SetRotation(glm::sin(animationTime / 16));
 
     Frameio::RenderCommand::SetClearColor({0.09f, 0.09f, 0.09f, 1.0f});
     Frameio::RenderCommand::Clear();
@@ -210,16 +217,16 @@ public:
   }
 
 private:
-  float animSpeed = 0.5f / 10;
-  int animTime = 0;
-  float cameraSpeed = 0.04f;
-
   std::shared_ptr<Frameio::Shader> m_Shader;
   std::shared_ptr<Frameio::Shader> m_ShaderPos;
   std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
   std::shared_ptr<Frameio::VertexArray> m_SquareVertexArray;
 
+  int animationTime = 0;
+
   Frameio::OrthographicCamera m_Camera;
+  float m_CameraMoveSpeed = 0.04f;
+  glm::vec3 m_CameraMoveDirection;
 };
 
 class TexturiaApp : public Frameio::App {
