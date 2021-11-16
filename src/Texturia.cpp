@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
 #include <imgui.h>
 
@@ -10,7 +11,10 @@ class GuiLayer : public Frameio::Layer {
 public:
   GuiLayer()
       : Layer("Texturia: Gui"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
-        m_CameraMoveDirection(0.0f) {
+        m_CameraMoveDirection(0.0f), m_BackgroundPosition{0.0f, 0.0f, 0.0f},
+        m_BackgroundScale{1.0f, 1.0f, 1.0f},
+        m_TrianglePosition{0.0f, 0.0f, 0.0f}, m_TriangleScale{1.0f, 1.0f,
+                                                              1.0f} {
 
     // TRIANGLE
     m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
@@ -44,7 +48,7 @@ public:
     // END TRIANGLE
 
     // SQUARE
-    m_SquareVertexArray.reset(Frameio::VertexArray::Create());
+    m_BackgroundVertexArray.reset(Frameio::VertexArray::Create());
 
     float squareVertices[4 * 7] = {
         // clang-format off
@@ -60,7 +64,7 @@ public:
         Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices));
 
     squareVertexBuffer->SetLayout(layout);
-    m_SquareVertexArray->AddVertexBuffer(squareVertexBuffer);
+    m_BackgroundVertexArray->AddVertexBuffer(squareVertexBuffer);
 
     uint32_t squareIndices[6] = {0, 1, 2, 0, 3, 2};
 
@@ -68,7 +72,7 @@ public:
     squareIndexBuffer.reset(Frameio::IndexBuffer::Create(
         sizeof(squareIndices) / sizeof(uint32_t), squareIndices));
 
-    m_SquareVertexArray->SetIndexBuffer(squareIndexBuffer);
+    m_BackgroundVertexArray->SetIndexBuffer(squareIndexBuffer);
     // END SQUARE
 
     std::string vertexSource = R"(
@@ -78,6 +82,7 @@ public:
             layout(location = 1) in vec4 a_Color;
 
             uniform mat4 u_ViewProjectionMatrix;
+            uniform mat4 u_TransformMatrix;
 
             out vec3 s_Position;
             out vec4 s_Color;
@@ -85,7 +90,7 @@ public:
             void main() {
               s_Position = a_Position;
               s_Color = a_Color;
-              gl_Position = u_ViewProjectionMatrix * vec4(a_Position, 1.0);
+              gl_Position = u_ViewProjectionMatrix * u_TransformMatrix * vec4(a_Position, 1.0);
             }
           )";
 
@@ -162,8 +167,20 @@ public:
 
     Frameio::Renderer::BeginScene(m_Camera);
 
-    Frameio::Renderer::Submit(m_SquareVertexArray, m_Shader);
-    Frameio::Renderer::Submit(m_TriangleVertexArray, m_ShaderPos);
+    Frameio::Renderer::Submit(
+        m_BackgroundVertexArray, m_Shader,
+        glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0],
+                                            m_BackgroundPosition[1],
+                                            m_BackgroundPosition[2])),
+                   glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1],
+                             m_BackgroundScale[2])));
+    Frameio::Renderer::Submit(
+        m_TriangleVertexArray, m_ShaderPos,
+        glm::scale(glm::translate(glm::vec3(m_TrianglePosition[0],
+                                            m_TrianglePosition[1],
+                                            m_TrianglePosition[2])),
+                   glm::vec3(m_TriangleScale[0], m_TriangleScale[1],
+                             m_TriangleScale[2])));
 
     Frameio::Renderer::EndScene();
   }
@@ -171,27 +188,19 @@ public:
   void OnImGuiRender() override {
     ImGui::DockSpaceOverViewport();
 
+    static bool showDemoWindow = false;
     static bool showMetricsWindow = true;
+    static bool showRendererDebugWindow = true;
 
     if (ImGui::BeginMainMenuBar()) {
-      if (ImGui::BeginMenu("File")) {
-        ImGui::MenuItem("1");
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Edit")) {
-        ImGui::MenuItem("1");
-        ImGui::EndMenu();
-      }
 
       if (ImGui::BeginMenu("View")) {
+        if (ImGui::MenuItem("Show ImGui Demo Window"))
+          showDemoWindow = showDemoWindow ? false : true;
+        if (ImGui::MenuItem("Show Renderer Debug Window"))
+          showRendererDebugWindow = showRendererDebugWindow ? false : true;
         if (ImGui::MenuItem("Show Metrics Window"))
           showMetricsWindow = showMetricsWindow ? false : true;
-        ImGui::EndMenu();
-      }
-
-      if (ImGui::BeginMenu("Help")) {
-        ImGui::MenuItem("1");
         ImGui::EndMenu();
       }
 
@@ -211,8 +220,22 @@ public:
       ImGui::EndMainMenuBar();
     }
 
+    if (showDemoWindow)
+      ImGui::ShowDemoWindow(&showDemoWindow);
+
     if (showMetricsWindow)
       ImGui::ShowMetricsWindow(&showMetricsWindow);
+
+    if (showRendererDebugWindow) {
+      ImGui::Begin("Renderer Debug", &showRendererDebugWindow);
+      ImGui::Text("Triangle");
+      ImGui::DragFloat3("Position##Triangle", m_TrianglePosition, 0.01f);
+      ImGui::DragFloat3("Scale##Triangle", m_TriangleScale, 0.01f);
+      ImGui::Text("Background");
+      ImGui::DragFloat3("Position##Background", m_BackgroundPosition, 0.01f);
+      ImGui::DragFloat3("Scale##Background", m_BackgroundScale, 0.01f);
+      ImGui::End();
+    }
   }
 
   void OnEvent(Frameio::Event &event) override {
@@ -223,16 +246,20 @@ public:
   }
 
 private:
-  std::shared_ptr<Frameio::Shader> m_Shader;
-  std::shared_ptr<Frameio::Shader> m_ShaderPos;
-  std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
-  std::shared_ptr<Frameio::VertexArray> m_SquareVertexArray;
-
   float m_Time = 0.0f;
 
   Frameio::OrthographicCamera m_Camera;
   float m_CameraMoveSpeed = 1.5f;
+
   glm::vec3 m_CameraMoveDirection;
+  std::shared_ptr<Frameio::Shader> m_Shader;
+  std::shared_ptr<Frameio::Shader> m_ShaderPos;
+  std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
+  float m_TrianglePosition[3];
+  float m_TriangleScale[3];
+  std::shared_ptr<Frameio::VertexArray> m_BackgroundVertexArray;
+  float m_BackgroundPosition[3];
+  float m_BackgroundScale[3];
 };
 
 class TexturiaApp : public Frameio::App {
