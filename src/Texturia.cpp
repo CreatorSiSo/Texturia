@@ -120,12 +120,12 @@ public:
     m_ShaderPos.reset(new Frameio::Shader(vertexSource, fragmentSourcePos));
   }
 
-  void OnUpdate() override {
-    animationTime++;
+  void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override {
+    m_Time += realDeltaTime;
 
     // clang-format off
     m_CameraMoveDirection = glm::rotateZ(
-      glm::vec3(0.0f, m_CameraMoveSpeed, 0.0f),
+      glm::vec3(0.0f, m_CameraMoveSpeed * realDeltaTime, 0.0f),
       glm::pi<float>() - glm::orientedAngle(
         glm::normalize(glm::vec2(0.0f, 1.0f)),
         glm::normalize(glm::vec2(
@@ -141,13 +141,13 @@ public:
 
     if (Frameio::Input::IsKeyDown(FR_KEY_A))
       m_Camera
-          .SetPosition(m_Camera.GetPosition() + glm::vec3(-m_CameraMoveSpeed, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, glm::half_pi<float>()) */);
+          .SetPosition(m_Camera.GetPosition() + glm::vec3(-m_CameraMoveSpeed * realDeltaTime, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, glm::half_pi<float>()) */);
 
     if (Frameio::Input::IsKeyDown(FR_KEY_S))
       m_Camera.SetPosition(m_Camera.GetPosition() + glm::rotateZ(m_CameraMoveDirection, glm::pi<float>()));
 
     if (Frameio::Input::IsKeyDown(FR_KEY_D))
-      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(m_CameraMoveSpeed, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, -glm::half_pi<float>()) */);
+      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(m_CameraMoveSpeed * realDeltaTime, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, -glm::half_pi<float>()) */);
     // clang-format on
 
     // m_Camera.SetRotation(glm::degrees(glm::orientedAngle(
@@ -155,7 +155,7 @@ public:
     //     glm::normalize(glm::vec2(Input::GetMouseX() / 1280 * 2 - 1,
     //                              Input::GetMouseY() / 720 * 2 - 1)))));
 
-    m_Camera.SetRotation(glm::sin(animationTime / 16));
+    m_Camera.SetRotation(glm::sin(m_Time));
 
     Frameio::RenderCommand::SetClearColor({0.09f, 0.09f, 0.09f, 1.0f});
     Frameio::RenderCommand::Clear();
@@ -171,6 +171,8 @@ public:
   void OnImGuiRender() override {
     ImGui::DockSpaceOverViewport();
 
+    static bool showMetricsWindow = true;
+
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("File")) {
         ImGui::MenuItem("1");
@@ -183,7 +185,8 @@ public:
       }
 
       if (ImGui::BeginMenu("View")) {
-        ImGui::MenuItem("1");
+        if (ImGui::MenuItem("Show Metrics Window"))
+          showMetricsWindow = showMetricsWindow ? false : true;
         ImGui::EndMenu();
       }
 
@@ -207,6 +210,9 @@ public:
 
       ImGui::EndMainMenuBar();
     }
+
+    if (showMetricsWindow)
+      ImGui::ShowMetricsWindow(&showMetricsWindow);
   }
 
   void OnEvent(Frameio::Event &event) override {
@@ -222,10 +228,10 @@ private:
   std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
   std::shared_ptr<Frameio::VertexArray> m_SquareVertexArray;
 
-  int animationTime = 0;
+  float m_Time = 0.0f;
 
   Frameio::OrthographicCamera m_Camera;
-  float m_CameraMoveSpeed = 0.04f;
+  float m_CameraMoveSpeed = 1.5f;
   glm::vec3 m_CameraMoveDirection;
 };
 
