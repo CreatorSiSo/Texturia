@@ -5,16 +5,18 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/vector_angle.hpp>
+// #define IMGUI_DEFINE_MATH_OPERATORS
+#include <frameio/../../src/ImGui/Components/Widgets.hpp>
 #include <imgui.h>
+// #include <imgui_internal.h>
 
 class GuiLayer : public Frameio::Layer {
 public:
   GuiLayer()
       : Layer("Texturia: Gui"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
-        m_CameraMoveDirection(0.0f), m_BackgroundPosition{0.0f, 0.0f, 0.0f},
-        m_BackgroundScale{1.0f, 1.0f, 1.0f},
-        m_TrianglePosition{0.0f, 0.0f, 0.0f}, m_TriangleScale{1.0f, 1.0f,
-                                                              1.0f} {
+        m_CameraMoveDirection(0.0f), m_BackgroundPosition(0.0f),
+        m_BackgroundScale(1.0f), m_TrianglePosition(0.0f),
+        m_TriangleScale(1.0f) {
 
     // TRIANGLE
     m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
@@ -228,12 +230,21 @@ public:
 
     if (showRendererDebugWindow) {
       ImGui::Begin("Renderer Debug", &showRendererDebugWindow);
+      ImGui::PushID("Triangle");
       ImGui::Text("Triangle");
-      ImGui::DragFloat3("Position##Triangle", m_TrianglePosition, 0.01f);
-      ImGui::DragFloat3("Scale##Triangle", m_TriangleScale, 0.01f);
+      ImGui::DragFloat3("Position", m_TrianglePosition);
+      // TODO Implement rotation of objects
+      ImGui::DragFloat3("Rotation", m_TrianglePosition);
+      ImGui::DragFloat3("Scale", m_TriangleScale, 1.0f);
+      ImGui::PopID();
+      ImGui::PushID("Background");
       ImGui::Text("Background");
-      ImGui::DragFloat3("Position##Background", m_BackgroundPosition, 0.01f);
-      ImGui::DragFloat3("Scale##Background", m_BackgroundScale, 0.01f);
+      ImGui::DragFloat3("Position", m_BackgroundPosition);
+      // TODO Implement rotation of objects
+      ImGui::DragFloat3("Rotation", m_BackgroundPosition);
+      ImGui::DragFloat3("Scale", m_BackgroundScale, 1.0f);
+      ImGui::PopID();
+
       ImGui::End();
     }
   }
@@ -255,11 +266,11 @@ private:
   std::shared_ptr<Frameio::Shader> m_Shader;
   std::shared_ptr<Frameio::Shader> m_ShaderPos;
   std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
-  float m_TrianglePosition[3];
-  float m_TriangleScale[3];
+  glm::vec3 m_TrianglePosition;
+  glm::vec3 m_TriangleScale;
   std::shared_ptr<Frameio::VertexArray> m_BackgroundVertexArray;
-  float m_BackgroundPosition[3];
-  float m_BackgroundScale[3];
+  glm::vec3 m_BackgroundPosition;
+  glm::vec3 m_BackgroundScale;
 };
 
 class TexturiaApp : public Frameio::App {
