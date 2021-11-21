@@ -1,2 +1,2 @@
-# texturia
-Procedural texture generator.
+# Texturia
+> Procedural texture generator.
