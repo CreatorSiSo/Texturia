@@ -26,7 +26,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin/${CMAKE_BUILD_TYPE})
 
 # Source Files
-set(SOURCES ./src/Texturia.cpp)
+set(SOURCES
+  ./src/Nodes.cpp
+  ./src/Texturia.cpp)
 
 
 # Targets
