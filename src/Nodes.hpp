@@ -11,7 +11,8 @@ public:
   Node(const std::string &label = "Node Label") : m_Label(label) {}
   ~Node() = default;
 
-  inline std::string ToString() const {
+  inline std::string ToString() const
+  {
     // clang-format off
 return m_Label + R"(
   test2: ifdhfuh,
@@ -29,17 +30,16 @@ public:
   NodesTree(std::string debugLabel = "Default");
   ~NodesTree() = default;
 
-  u_int64_t AddNode(const Node &node);
-  Node GetNode(const u_int64_t &ID);
-  void DeleteNode(const u_int64_t &ID);
+  u_int64_t AddNode(const Node& node);
+  Node GetNode(const u_int64_t& ID);
+  void DeleteNode(const u_int64_t& ID);
   void DeleteNode(u_int64_t ID[3]);
   void Clear();
 
-  inline std::string ToString() const {
+  inline std::string ToString() const
+  {
     std::string returnString;
-    for (auto node : m_Nodes)
-      returnString.append("\n" + std::to_string(node.first) + ": " +
-                          node.second.ToString());
+    for (auto node : m_Nodes) returnString.append("\n" + std::to_string(node.first) + ": " + node.second.ToString());
     return returnString;
   }
 
@@ -49,11 +49,13 @@ private:
   u_int64_t m_LastID = 0;
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Node &node) {
+inline std::ostream& operator<<(std::ostream& os, const Node& node)
+{
   return os << node.ToString();
 }
 
-inline std::ostream &operator<<(std::ostream &os, const NodesTree &nodesTree) {
+inline std::ostream& operator<<(std::ostream& os, const NodesTree& nodesTree)
+{
   return os << nodesTree.ToString();
 }
 

@@ -5,7 +5,8 @@
 // Really dumb data structure provided for the example.
 // Note that we storing links are INDICES (not ID) to make example code
 // shorter, obviously a bad idea for any general purpose code.
-static void ShowExampleAppCustomNodeGraph(bool *opened) {
+static void ShowExampleAppCustomNodeGraph(bool* opened)
+{
   struct Node {
     int ID;
     char Name[32];
@@ -13,8 +14,8 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
     float Value;
     int InputsCount, OutputsCount;
 
-    Node(int id, const char *name, const ImVec2 &pos, float value,
-         int inputs_count, int outputs_count) {
+    Node(int id, const char* name, const ImVec2& pos, float value, int inputs_count, int outputs_count)
+    {
       ID = id;
       strncpy(Name, name, 31);
       Name[31] = 0;
@@ -24,19 +25,21 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
       OutputsCount = outputs_count;
     }
 
-    ImVec2 GetInputSlotPos(int slot_no) const {
-      return ImVec2(Pos.x, Pos.y + Size.y * ((float)slot_no + 1) /
-                                       ((float)InputsCount + 1));
+    ImVec2 GetInputSlotPos(int slot_no) const
+    {
+      return ImVec2(Pos.x, Pos.y + Size.y * ((float)slot_no + 1) / ((float)InputsCount + 1));
     }
-    ImVec2 GetOutputSlotPos(int slot_no) const {
-      return ImVec2(Pos.x + Size.x, Pos.y + Size.y * ((float)slot_no + 1) /
-                                                ((float)OutputsCount + 1));
+    ImVec2 GetOutputSlotPos(int slot_no) const
+    {
+      return ImVec2(Pos.x + Size.x, Pos.y + Size.y * ((float)slot_no + 1) / ((float)OutputsCount + 1));
     }
   };
+
   struct NodeLink {
     int InputIdx, InputSlot, OutputIdx, OutputSlot;
 
-    NodeLink(int input_idx, int input_slot, int output_idx, int output_slot) {
+    NodeLink(int input_idx, int input_slot, int output_idx, int output_slot)
+    {
       InputIdx = input_idx;
       InputSlot = input_slot;
       OutputIdx = output_idx;
@@ -67,11 +70,10 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
 
   ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(1, 1));
   ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-  ImGui::BeginChild("scrolling_region", ImVec2(0, 0), true,
-                    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
+  ImGui::BeginChild("scrolling_region", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove);
   ImGui::PushItemWidth(120.0f);
 
-  ImDrawList *draw_list = ImGui::GetWindowDrawList();
+  ImDrawList* draw_list = ImGui::GetWindowDrawList();
   draw_list->ChannelsSplit(2);
   ImVec2 offset = ImGui::GetCursorScreenPos() - scrolling;
 
@@ -81,7 +83,7 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
 
   // Render nodes
   for (int node_idx = 0; node_idx < nodes.Size; node_idx++) {
-    Node *node = &nodes[node_idx];
+    Node* node = &nodes[node_idx];
     ImGui::PushID(node->ID);
 
     ImVec2 node_rect_min = offset + node->Pos;
@@ -95,8 +97,7 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
     ImGui::Text("%s", node->Name);
     ImGui::EndGroup();
 
-    node->Size =
-        ImGui::GetItemRectSize() + NODE_WINDOW_PADDING + NODE_WINDOW_PADDING;
+    node->Size = ImGui::GetItemRectSize() + NODE_WINDOW_PADDING + NODE_WINDOW_PADDING;
     ImVec2 node_rect_max = node_rect_min + node->Size;
 
     bool node_widgets_active = (!old_any_active && ImGui::IsAnyItemActive());
@@ -110,8 +111,7 @@ static void ShowExampleAppCustomNodeGraph(bool *opened) {
   draw_list->ChannelsMerge();
 
   // Scrolling
-  if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() &&
-      ImGui::IsMouseDragging(2, 0.0f)) {
+  if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemActive() && ImGui::IsMouseDragging(2, 0.0f)) {
     scrolling.x -= ImGui::GetIO().MouseDelta.x;
     scrolling.y -= ImGui::GetIO().MouseDelta.y;
   }

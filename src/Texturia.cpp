@@ -9,43 +9,47 @@
 #include <glm/gtx/vector_angle.hpp>
 
 // #include "LookupNodes.hpp"
+
 #include "Nodes.hpp"
 
 class GuiLayer : public Frameio::Layer {
 public:
   GuiLayer()
-      : Layer("Texturia: Gui"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
-        m_CameraMoveDirection(0.0f), m_BackgroundPosition(0.0f),
-        m_BackgroundScale(1.0f), m_TrianglePosition(0.0f),
-        m_TriangleScale(1.0f) {
-
+      : Layer("Texturia: Gui"),
+        m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
+        m_CameraMoveDirection(0.0f),
+        m_BackgroundPosition(0.0f),
+        m_BackgroundScale(1.0f),
+        m_TrianglePosition(0.0f),
+        m_TriangleScale(1.0f)
+  {
     // TRIANGLE
     m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
 
     float triangleVertices[3 * 7] = {
-        // clang-format off
-       0.0f,  0.5f, 0.0f, 0.1f, 0.6f, 1.0f, 1.0f,
-       0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
-      -0.5f, -0.5f, 0.0f, 0.4f, 0.1f, 1.0f, 1.0f
-        // clang-format on
+      // clang-format off
+           0.0f,  0.5f, 0.0f, 0.1f, 0.6f, 1.0f, 1.0f,
+           0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
+          -0.5f, -0.5f, 0.0f, 0.4f, 0.1f, 1.0f, 1.0f
+      // clang-format on
     };
 
-    std::shared_ptr<Frameio::VertexBuffer> triangleVertexBuffer;
-    triangleVertexBuffer.reset(Frameio::VertexBuffer::Create(
-        sizeof(triangleVertices), triangleVertices));
+    Frameio::Ref<Frameio::VertexBuffer> triangleVertexBuffer;
+    triangleVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(triangleVertices), triangleVertices));
 
     Frameio::BufferLayout layout = {
-        {Frameio::ShaderDataType::Float3, "a_Position"},
-        {Frameio::ShaderDataType::Float4, "a_Color"}};
+      {Frameio::ShaderDataType::Float3, "a_Position"},
+      {Frameio::ShaderDataType::Float4,    "a_Color"}
+    };
 
     triangleVertexBuffer->SetLayout(layout);
     m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
 
-    uint32_t triangleIndices[3] = {0, 1, 2};
+    uint32_t triangleIndices[3] = { 0, 1, 2 };
 
-    std::shared_ptr<Frameio::IndexBuffer> triangleIndexBuffer;
-    triangleIndexBuffer.reset(Frameio::IndexBuffer::Create(
-        sizeof(triangleIndices) / sizeof(uint32_t), triangleIndices));
+    Frameio::Ref<Frameio::IndexBuffer> triangleIndexBuffer;
+    triangleIndexBuffer.reset(
+        Frameio::IndexBuffer::Create(sizeof(triangleIndices) / sizeof(uint32_t), triangleIndices));
 
     m_TriangleVertexArray->SetIndexBuffer(triangleIndexBuffer);
     // END TRIANGLE
@@ -54,62 +58,62 @@ public:
     m_BackgroundVertexArray.reset(Frameio::VertexArray::Create());
 
     float squareVertices[4 * 7] = {
-        // clang-format off
-      -1.6f,  0.9f, 0.0f, 0.7f, 0.3f, 0.2f, 1.0f,
-       1.6f,  0.9f, 0.0f, 0.9f, 0.3f, 0.3f, 1.0f,
-       1.6f, -0.9f, 0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
-      -1.6f, -0.9f, 0.0f, 0.8f, 0.2f, 0.2f, 1.0f
-        // clang-format on
+      // clang-format off
+          -1.6f,  0.9f, 0.0f, 0.7f, 0.3f, 0.2f, 1.0f,
+           1.6f,  0.9f, 0.0f, 0.9f, 0.3f, 0.3f, 1.0f,
+           1.6f, -0.9f, 0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
+          -1.6f, -0.9f, 0.0f, 0.8f, 0.2f, 0.2f, 1.0f
+      // clang-format on
     };
 
-    std::shared_ptr<Frameio::VertexBuffer> squareVertexBuffer;
-    squareVertexBuffer.reset(
-        Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices));
+    Frameio::Ref<Frameio::VertexBuffer> squareVertexBuffer;
+    squareVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices));
 
     squareVertexBuffer->SetLayout(layout);
     m_BackgroundVertexArray->AddVertexBuffer(squareVertexBuffer);
 
-    uint32_t squareIndices[6] = {0, 1, 2, 0, 3, 2};
+    uint32_t squareIndices[6] = { 0, 1, 2, 0, 3, 2 };
 
-    std::shared_ptr<Frameio::IndexBuffer> squareIndexBuffer;
-    squareIndexBuffer.reset(Frameio::IndexBuffer::Create(
-        sizeof(squareIndices) / sizeof(uint32_t), squareIndices));
+    Frameio::Ref<Frameio::IndexBuffer> squareIndexBuffer;
+    squareIndexBuffer.reset(Frameio::IndexBuffer::Create(sizeof(squareIndices) / sizeof(uint32_t), squareIndices));
 
     m_BackgroundVertexArray->SetIndexBuffer(squareIndexBuffer);
     // END SQUARE
 
-    std::string vertexSource = R"(
-            #version 330 core
+    std::string vertexSource =
+        R"(
+        #version 330 core
 
-            layout(location = 0) in vec3 a_Position;
-            layout(location = 1) in vec4 a_Color;
+        layout(location = 0) in vec3 a_Position;
+        layout(location = 1) in vec4 a_Color;
 
-            uniform mat4 u_ViewProjectionMatrix;
-            uniform mat4 u_TransformMatrix;
+        uniform mat4 u_ViewProjectionMatrix;
+        uniform mat4 u_TransformMatrix;
 
-            out vec3 s_Position;
-            out vec4 s_Color;
+        out vec3 s_Position;
+        out vec4 s_Color;
 
-            void main() {
-              s_Position = a_Position;
-              s_Color = a_Color;
-              gl_Position = u_ViewProjectionMatrix * u_TransformMatrix * vec4(a_Position, 1.0);
-            }
-          )";
+        void main() {
+          s_Position = a_Position;
+          s_Color = a_Color;
+          gl_Position = u_ViewProjectionMatrix * u_TransformMatrix * vec4(a_Position, 1.0);
+        }
+      )";
 
-    std::string fragmentSource = R"(
-            #version 330 core
+    std::string fragmentSource =
+        R"(
+        #version 330 core
 
-            layout(location = 0) out vec4 o_Color;
+        layout(location = 0) out vec4 o_Color;
 
-            in vec3 s_Position;
-            in vec4 s_Color;
+        in vec3 s_Position;
+        in vec4 s_Color;
 
-            void main() {
-              // o_Color = vec4(s_Position, 1.0);
-              o_Color = s_Color;
-            }
-          )";
+        void main() {
+          // o_Color = vec4(s_Position, 1.0);
+          o_Color = s_Color;
+        }
+      )";
 
     std::string fragmentSourcePos = R"(
             #version 330 core
@@ -128,7 +132,8 @@ public:
     m_ShaderPos.reset(new Frameio::Shader(vertexSource, fragmentSourcePos));
   }
 
-  void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override {
+  void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
+  {
     m_Time += realDeltaTime;
 
     // clang-format off
@@ -165,30 +170,27 @@ public:
 
     m_Camera.SetRotation(glm::sin(m_Time));
 
-    Frameio::RenderCommand::SetClearColor({0.09f, 0.09f, 0.09f, 1.0f});
+    Frameio::RenderCommand::SetClearColor({ 0.09f, 0.09f, 0.09f, 1.0f });
     Frameio::RenderCommand::Clear();
 
     Frameio::Renderer::BeginScene(m_Camera);
 
     Frameio::Renderer::Submit(
-        m_BackgroundVertexArray, m_Shader,
-        glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0],
-                                            m_BackgroundPosition[1],
-                                            m_BackgroundPosition[2])),
-                   glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1],
-                             m_BackgroundScale[2])));
+        m_BackgroundVertexArray,
+        m_Shader,
+        glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0], m_BackgroundPosition[1], m_BackgroundPosition[2])),
+                   glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1], m_BackgroundScale[2])));
     Frameio::Renderer::Submit(
-        m_TriangleVertexArray, m_ShaderPos,
-        glm::scale(glm::translate(glm::vec3(m_TrianglePosition[0],
-                                            m_TrianglePosition[1],
-                                            m_TrianglePosition[2])),
-                   glm::vec3(m_TriangleScale[0], m_TriangleScale[1],
-                             m_TriangleScale[2])));
+        m_TriangleVertexArray,
+        m_ShaderPos,
+        glm::scale(glm::translate(glm::vec3(m_TrianglePosition[0], m_TrianglePosition[1], m_TrianglePosition[2])),
+                   glm::vec3(m_TriangleScale[0], m_TriangleScale[1], m_TriangleScale[2])));
 
     Frameio::Renderer::EndScene();
   }
 
-  void OnImGuiRender() override {
+  void OnImGuiRender() override
+  {
     ImGui::DockSpaceOverViewport();
 
     static bool showDemoWindow = false;
@@ -197,16 +199,11 @@ public:
     static bool showNodesEditorWindow = true;
 
     if (ImGui::BeginMainMenuBar()) {
-
       if (ImGui::BeginMenu("View")) {
-        if (ImGui::MenuItem("ImGui Demo"))
-          showDemoWindow = showDemoWindow ? false : true;
-        if (ImGui::MenuItem("Renderer Debug"))
-          showRendererDebugWindow = showRendererDebugWindow ? false : true;
-        if (ImGui::MenuItem("Metrics"))
-          showMetricsWindow = showMetricsWindow ? false : true;
-        if (ImGui::MenuItem("Nodes Editor"))
-          showMetricsWindow = showNodesEditorWindow ? false : true;
+        if (ImGui::MenuItem("ImGui Demo")) showDemoWindow = showDemoWindow ? false : true;
+        if (ImGui::MenuItem("Renderer Debug")) showRendererDebugWindow = showRendererDebugWindow ? false : true;
+        if (ImGui::MenuItem("Metrics")) showMetricsWindow = showMetricsWindow ? false : true;
+        if (ImGui::MenuItem("Nodes Editor")) showMetricsWindow = showNodesEditorWindow ? false : true;
         ImGui::EndMenu();
       }
 
@@ -226,11 +223,9 @@ public:
       ImGui::EndMainMenuBar();
     }
 
-    if (showDemoWindow)
-      ImGui::ShowDemoWindow(&showDemoWindow);
+    if (showDemoWindow) ImGui::ShowDemoWindow(&showDemoWindow);
 
-    if (showMetricsWindow)
-      ImGui::ShowMetricsWindow(&showMetricsWindow);
+    if (showMetricsWindow) ImGui::ShowMetricsWindow(&showMetricsWindow);
 
     if (showRendererDebugWindow) {
       ImGui::Begin("Renderer Debug", &showRendererDebugWindow);
@@ -256,17 +251,17 @@ public:
     if (showNodesEditorWindow) {
       ImGui::Begin("Nodes Editor");
       ImGui::BeginNode();
-      ImGui::SliderFloat("##value", &value1 /* &node->Value */, 0.0f, 1.0f,
-                         "Alpha %.2f");
+      ImGui::SliderFloat("##value", &value1 /* &node->Value */, 0.0f, 1.0f, "Alpha %.2f");
       ImGui::EndNode();
       // ShowExampleAppCustomNodeGraph(&showNodesEditorWindow);
       ImGui::End();
     }
   }
 
-  void OnEvent(Frameio::Event &event) override {
+  void OnEvent(Frameio::Event& event) override
+  {
     if (event.GetEventType() == Frameio::EventType::KeyTyped) {
-      Frameio::KeyTypedEvent &e = (Frameio::KeyTypedEvent &)event;
+      Frameio::KeyTypedEvent& e = (Frameio::KeyTypedEvent&)event;
       FR_TRACE((char)e.GetKeyCode());
     }
   }
@@ -278,44 +273,36 @@ private:
   float m_CameraMoveSpeed = 1.5f;
 
   glm::vec3 m_CameraMoveDirection;
-  std::shared_ptr<Frameio::Shader> m_Shader;
-  std::shared_ptr<Frameio::Shader> m_ShaderPos;
-  std::shared_ptr<Frameio::VertexArray> m_TriangleVertexArray;
+  Frameio::Ref<Frameio::Shader> m_Shader;
+  Frameio::Ref<Frameio::Shader> m_ShaderPos;
+  Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
   glm::vec3 m_TrianglePosition;
   glm::vec3 m_TriangleScale;
-  std::shared_ptr<Frameio::VertexArray> m_BackgroundVertexArray;
+  Frameio::Ref<Frameio::VertexArray> m_BackgroundVertexArray;
   glm::vec3 m_BackgroundPosition;
   glm::vec3 m_BackgroundScale;
 };
 
 class TexturiaApp : public Frameio::App {
 public:
-  TexturiaApp() {
+  TexturiaApp()
+  {
+    Texturia::NodesTree mainNodesTree;
+    // mainNodesTree.AddNode(Texturia::Node("Math"));
+    // mainNodesTree.AddNode(Texturia::Node("Camera"));
+    mainNodesTree.AddNode(Texturia::Node());
+    // mainNodesTree.AddNode(Texturia::Node("Collection"));
+    // mainNodesTree.AddNode(Texturia::Node("Mesh Line"));
+    // mainNodesTree.AddNode(Texturia::Node("Flat Color"));
+    FR_INFO("{0}...", mainNodesTree);
+
     PushOverlay(new GuiLayer());
-
-    Texturia::NodesTree testTree;
-    testTree.AddNode(Texturia::Node("Math"));
-    testTree.AddNode(Texturia::Node("Camera"));
-    testTree.AddNode(Texturia::Node("Scene"));
-    testTree.AddNode(Texturia::Node("Collection"));
-    testTree.AddNode(Texturia::Node("Mesh Line"));
-    testTree.AddNode(Texturia::Node("Flat Color"));
-    FR_INFO("{0}...", testTree);
-
-    testTree.DeleteNode(1);
-    testTree.DeleteNode(5);
-    FR_INFO("{0}...", testTree);
-
-    testTree.AddNode(Texturia::Node("Hello World!"));
-    testTree.AddNode(Texturia::Node("Rainbow"));
-    testTree.AddNode(Texturia::Node("Last One"));
-    FR_INFO("{0}...", testTree);
-
-    testTree.Clear();
-    FR_INFO("{0}...", testTree);
   }
 
   ~TexturiaApp() = default;
 };
 
-Frameio::App *Frameio::CreateApp() { return new TexturiaApp(); }
+Frameio::App* Frameio::CreateApp()
+{
+  return new TexturiaApp();
+}
