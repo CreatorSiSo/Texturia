@@ -288,13 +288,13 @@ public:
   TexturiaApp()
   {
     Texturia::NodesTree mainNodesTree;
-    // mainNodesTree.AddNode(Texturia::Node("Math"));
-    // mainNodesTree.AddNode(Texturia::Node("Camera"));
+
     mainNodesTree.AddNode(Texturia::Node());
-    // mainNodesTree.AddNode(Texturia::Node("Collection"));
-    // mainNodesTree.AddNode(Texturia::Node("Mesh Line"));
-    // mainNodesTree.AddNode(Texturia::Node("Flat Color"));
-    FR_INFO("{0}...", mainNodesTree);
+    mainNodesTree.AddNode(Texturia::Node());
+    mainNodesTree.AddNode(Texturia::Node());
+    mainNodesTree.AddNode(Texturia::Node());
+    mainNodesTree.AddNode(Texturia::Node());
+    FR_INFO("{0}", mainNodesTree);
 
     PushOverlay(new GuiLayer());
   }

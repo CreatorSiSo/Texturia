@@ -1,7 +1,5 @@
 #include "Nodes.hpp"
 
-Texturia::NodesTree::NodesTree(std::string debugLabel) : m_DebugLabel(debugLabel) {}
-
 uint64_t Texturia::NodesTree::AddNode(const Node& node)
 {
   m_LastID++;
