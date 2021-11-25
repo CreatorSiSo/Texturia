@@ -52,7 +52,7 @@ target_include_directories(
   PRIVATE ./libs/frameio/src
   PRIVATE ./libs/frameio/include
   PRIVATE ./libs/frameio/spdlog/include
-  PRIVATE ./libs/frameio/glm/include
+  PRIVATE ./libs/frameio/libs/glm
   PRIVATE ./src)
 
 # External Libraries
