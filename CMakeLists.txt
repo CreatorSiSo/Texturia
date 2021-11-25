@@ -62,7 +62,7 @@ add_subdirectory(./libs/frameio)
 target_link_libraries(${PROJECT_NAME} frameio)
 
 # Precompiled Headers
-# target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
+target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
 
 # Post Build
 add_custom_command(
