@@ -2,6 +2,8 @@
 
 #include "txpch.hpp"
 
+#include <frameio/frameio.hpp>
+
 #include <cstdint>
 #include <iterator>
 #include <variant>
@@ -20,40 +22,52 @@ struct VariantToString {
 using NodeSocketType = std::variant<bool, int, float, char, std::string>;
 
 struct NodeSocket {
+  std::string Label;
   NodeSocketType Value;
 
-  NodeSocket(const NodeSocketType& defaultValue) : Value(defaultValue) {}
+  NodeSocket(std::string label, const NodeSocketType& initialValue) : Label(label), Value(initialValue) {}
   ~NodeSocket() = default;
+
+  inline std::string ToString() const
+  {
+    std::ostringstream os;
+    os << Label << ": " << std::visit(VariantToString(), Value);
+    return os.str();
+  }
 };
 
-class Node {
-public:
-  Node(const std::string& label = "Default Node") : m_Label(label)
+struct Node {
+  std::string Label;
+  Frameio::UUID UUID;
+
+  Node(const std::string& label = "Default Node", Frameio::UUID uuid = Frameio::UUID()) : Label(label), UUID(uuid)
   {
-    m_NodeSockets.push_back(NodeSocket(true));
-    m_NodeSockets.push_back(NodeSocket(1));
-    m_NodeSockets.push_back(NodeSocket(1.0f));
-    m_NodeSockets.push_back(NodeSocket('c'));
-    m_NodeSockets.push_back(NodeSocket("string"));
+    m_NodeSockets.push_back(NodeSocket("Bool", true));
+    m_NodeSockets.push_back(NodeSocket("Int", 1));
+    m_NodeSockets.push_back(NodeSocket("Float", 1.0f));
+    m_NodeSockets.push_back(NodeSocket("Char", 'c'));
+    m_NodeSockets.push_back(NodeSocket("String", "string"));
   }
+
   ~Node() = default;
 
   inline std::string ToString() const
   {
     std::ostringstream os;
-    os << m_Label << ": { ";
+    os << "{\n  Label: " << Label << ","
+       << "\n  UUID: " << UUID << ","
+       << "\n  Sockets: {";
     if (!m_NodeSockets.empty()) {
-      for (NodeSocket nodeSocket : m_NodeSockets) { os << std::visit(VariantToString(), nodeSocket.Value) << ", "; }
+      for (NodeSocket nodeSocket : m_NodeSockets) { os << "\n    " << nodeSocket.ToString() << ", "; }
       os.seekp(-2, os.cur);
     } else {
       os << "!EMPTY!";
     }
-    os << " }";
+    os << "\n  }\n}";
     return os.str();
   }
 
 private:
-  std::string m_Label;
   std::vector<Texturia::NodeSocket> m_NodeSockets;
 };
 
@@ -64,20 +78,21 @@ inline std::ostream& operator<<(std::ostream& os, const Node& node)
 
 class NodesTree {
 public:
-  NodesTree(std::string name = "Default Node Tree") : m_Name(name) {}
+  NodesTree(std::string label = "Default Node Tree") : m_Label(label) {}
   ~NodesTree() = default;
 
-  u_int64_t AddNode(const Node& node);
-  Node GetNode(const u_int64_t& ID);
-  void DeleteNode(const u_int64_t& ID);
+  Frameio::UUID AddNode();
+  // Frameio::UUID AddNode(const Node& node);
+  // Frameio::Ref<Node> GetNodeRef(const Frameio::UUID& uuid);
+  void DeleteNode(const Frameio::UUID& uuid);
   void Clear();
 
   inline std::string ToString() const
   {
     std::ostringstream os;
-    os << m_Name << ":";
+    os << m_Label << ":";
     if (!m_Nodes.empty()) {
-      for (auto node : m_Nodes) os << "\n" + std::to_string(node.first) + ": " + node.second.ToString();
+      for (auto node : m_Nodes) os << "\n" + node.second.ToString();
     } else {
       os << " !EMPTY!";
     }
@@ -85,9 +100,8 @@ public:
   }
 
 private:
-  std::string m_Name;
-  std::unordered_map<u_int64_t, Node> m_Nodes;
-  u_int64_t m_LastID = 0;
+  std::string m_Label;
+  std::unordered_map<Frameio::UUID, Node> m_Nodes;
 };
 
 inline std::ostream& operator<<(std::ostream& os, const NodesTree& nodesTree)

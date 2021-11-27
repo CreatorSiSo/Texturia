@@ -1,20 +1,20 @@
 #include "Nodes.hpp"
 
-uint64_t Texturia::NodesTree::AddNode(const Node& node)
+Frameio::UUID Texturia::NodesTree::AddNode()
 {
-  m_LastID++;
-  m_Nodes[m_LastID] = node;
-  return m_LastID;
+  Frameio::UUID uuid;
+  m_Nodes[uuid] = Node("label", uuid);
+  return uuid;
 }
 
-Texturia::Node Texturia::NodesTree::GetNode(const u_int64_t& ID)
-{
-  return m_Nodes[ID];
-}
+// Frameio::Ref<Texturia::Node> Texturia::NodesTree::GetNodeRef(const Frameio::UUID& uuid)
+// {
+//   return Frameio::Ref<Texturia::Node>(m_Nodes);
+// }
 
-void Texturia::NodesTree::DeleteNode(const u_int64_t& ID)
+void Texturia::NodesTree::DeleteNode(const Frameio::UUID& uuid)
 {
-  m_Nodes.erase(ID);
+  m_Nodes.erase(uuid);
 }
 
 void Texturia::NodesTree::Clear()

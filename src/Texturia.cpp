@@ -1,8 +1,9 @@
 #include "txpch.hpp"
 
-#include <frameio/../../src/ImGui/Components/Nodes.hpp>
-#include <frameio/../../src/ImGui/Components/Widgets.hpp>
+#include <frameio/ImGui/Nodes.hpp>
+#include <frameio/ImGui/Widgets.hpp>
 #include <frameio/frameio.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -13,6 +14,11 @@
 #include "Nodes.hpp"
 
 namespace Texturia {
+
+void miniMapNodeHoverCallback(int nodeID, void* userData)
+{
+  ImGui::SetTooltip("This is node %d", nodeID);
+}
 
 class GuiLayer : public Frameio::Layer {
 public:
@@ -251,11 +257,57 @@ public:
 
     static float value1 = 0.0f;
     if (showNodesEditorWindow) {
+      static std::vector<std::pair<int, int>> links;
+      static const Frameio::UUID hardcodedNodeID;
+      static const Frameio::UUID OutAttributeID;
+      static const Frameio::UUID InAttributeID;
+
       ImGui::Begin("Nodes Editor");
-      ImGui::BeginNode();
-      ImGui::SliderFloat("##value", &value1 /* &node->Value */, 0.0f, 1.0f, "Alpha %.2f");
-      ImGui::EndNode();
-      // ShowExampleAppCustomNodeGraph(&showNodesEditorWindow);
+      ImNodes::BeginNodeEditor();
+
+      ImNodes::BeginNode(hardcodedNodeID);
+      ImNodes::BeginNodeTitleBar();
+      ImGui::TextUnformatted("Test Node");
+      ImNodes::EndNodeTitleBar();
+
+      ImNodes::BeginOutputAttribute(2, ImNodesPinShape_TriangleFilled);
+      ImGui::Text("Output Socket");
+      ImNodes::EndOutputAttribute();
+      ImNodes::BeginInputAttribute(3, ImNodesPinShape_QuadFilled);
+
+      ImGui::Text("Input Socket");
+      ImNodes::EndInputAttribute();
+      ImNodes::EndNode();
+
+      ImNodes::BeginNode(4);
+      ImNodes::BeginNodeTitleBar();
+      ImGui::TextUnformatted("Test Node");
+      ImNodes::EndNodeTitleBar();
+
+      ImNodes::BeginOutputAttribute(5);
+      ImGui::Text("Output Socket");
+      ImNodes::EndOutputAttribute();
+      ImNodes::BeginInputAttribute(6);
+
+      ImGui::Text("Input Socket");
+      ImNodes::EndInputAttribute();
+      ImNodes::EndNode();
+
+      ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_BottomLeft, miniMapNodeHoverCallback);
+
+      for (int i = 0; i < links.size(); ++i) {
+        const std::pair<int, int> link = links[i];
+        ImNodes::Link(i, link.first, link.second);
+      }
+
+      ImNodes::EndNodeEditor();
+
+      int start_attr, end_attr;
+      if (ImNodes::IsLinkCreated(&start_attr, &end_attr)) { links.push_back(std::make_pair(start_attr, end_attr)); }
+
+      int linkID;
+      if (ImNodes::IsLinkDestroyed(&linkID)) { links.erase(links.begin() + linkID); }
+
       ImGui::End();
     }
   }
@@ -289,13 +341,9 @@ class TexturiaApp : public Frameio::App {
 public:
   TexturiaApp()
   {
-    Texturia::NodesTree mainNodesTree;
+    NodesTree mainNodesTree;
 
-    mainNodesTree.AddNode(Texturia::Node());
-    mainNodesTree.AddNode(Texturia::Node());
-    mainNodesTree.AddNode(Texturia::Node());
-    mainNodesTree.AddNode(Texturia::Node());
-    mainNodesTree.AddNode(Texturia::Node());
+    mainNodesTree.AddNode();
     FR_INFO("{0}", mainNodesTree);
 
     PushOverlay(new GuiLayer());
