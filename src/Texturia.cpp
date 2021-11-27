@@ -12,6 +12,8 @@
 // #include "LookupNodes.hpp"
 #include "Nodes.hpp"
 
+namespace Texturia {
+
 class GuiLayer : public Frameio::Layer {
 public:
   GuiLayer()
@@ -302,7 +304,9 @@ public:
   ~TexturiaApp() = default;
 };
 
+} // namespace Texturia
+
 Frameio::App* Frameio::CreateApp()
 {
-  return new TexturiaApp();
+  return new Texturia::TexturiaApp();
 }
