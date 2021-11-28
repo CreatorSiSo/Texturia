@@ -20,7 +20,7 @@ namespace Texturia {
 //! The displayed ID might not be the same as the one saved in our Node object because we use uint64_t and not int
 void MiniMapNodeHoverCallback(int nodeUUID, void* userData)
 {
-  ImGui::SetTooltip("Node UUID: %d !Not always correct!", nodeUUID);
+  ImGui::SetTooltip("Node UUID: %d", nodeUUID);
 }
 
 class GuiLayer : public Frameio::Layer {
@@ -143,12 +143,12 @@ public:
     m_ShaderPos.reset(new Frameio::Shader(vertexSource, fragmentSourcePos));
 
     m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
-    //! These UUIDs cause ImNodes to have different ones because it uses just integers
-    m_NodesTree->AddNode(Node("Node 1", 432199990000));
-    m_NodesTree->AddNode(Node("Node 2", 123466660000));
+    m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
+    //! This UUID causes ImNodes to use -2147483648 because of integer overflow
+    m_NodesTree->AddNode(Node("Old Node 2", 2147483648));
 
-    m_NodesTree->AddNode(Node("New Node 1"));
-    m_NodesTree->AddNode(Node("New Node 2"));
+    m_NodesTree->AddNode(Node("New Node 1", Frameio::UUID(Frameio::Int32Range)));
+    m_NodesTree->AddNode(Node("New Node 2", Frameio::UUID(Frameio::Int32Range)));
   }
 
   void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
@@ -281,12 +281,6 @@ public:
 
       ImGui::Begin("Nodes Editor");
       ImNodes::BeginNodeEditor();
-
-      // static bool printedMainNodesTree = false;
-      // if (!printedMainNodesTree) {
-      //   FR_INFO("{0}", *m_NodesTree);
-      //   printedMainNodesTree = true;
-      // }
 
       m_NodesTree->OnImGuiRender();
 
