@@ -39,9 +39,9 @@ public:
 
     float triangleVertices[3 * 7] = {
       // clang-format off
-           0.0f,  0.5f, 0.0f, 0.1f, 0.6f, 1.0f, 1.0f,
-           0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
-          -0.5f, -0.5f, 0.0f, 0.4f, 0.1f, 1.0f, 1.0f
+         0.0f,  0.5f, 0.0f, 0.1f, 0.6f, 1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
+        -0.5f, -0.5f, 0.0f, 0.4f, 0.1f, 1.0f, 1.0f
       // clang-format on
     };
 
@@ -70,10 +70,10 @@ public:
 
     float squareVertices[4 * 7] = {
       // clang-format off
-          -1.6f,  0.9f, 0.0f, 0.7f, 0.3f, 0.2f, 1.0f,
-           1.6f,  0.9f, 0.0f, 0.9f, 0.3f, 0.3f, 1.0f,
-           1.6f, -0.9f, 0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
-          -1.6f, -0.9f, 0.0f, 0.8f, 0.2f, 0.2f, 1.0f
+        -1.6f,  0.9f, 0.0f, 0.7f, 0.3f, 0.2f, 1.0f,
+         1.6f,  0.9f, 0.0f, 0.9f, 0.3f, 0.3f, 1.0f,
+         1.6f, -0.9f, 0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
+        -1.6f, -0.9f, 0.0f, 0.8f, 0.2f, 0.2f, 1.0f
       // clang-format on
     };
 
@@ -155,32 +155,31 @@ public:
   {
     m_Time += realDeltaTime;
 
-    // clang-format off
     m_CameraMoveDirection = glm::rotateZ(
-      glm::vec3(0.0f, m_CameraMoveSpeed * realDeltaTime, 0.0f),
-      glm::pi<float>() - glm::orientedAngle(
-        glm::normalize(glm::vec2(0.0f, 1.0f)),
-        glm::normalize(glm::vec2(
-          // TODO Access window from layer
-          Frameio::Input::GetMouseX() /  1280 * 2 - 1,
-          Frameio::Input::GetMouseY() / 720 /* m_Window->GetHeight( )*/ * 2 - 1)
-        )
-      )
-    );
+        glm::vec3(0.0f, m_CameraMoveSpeed * realDeltaTime, 0.0f),
+        glm::pi<float>() -
+            glm::orientedAngle(glm::normalize(glm::vec2(0.0f, 1.0f)),
+                               glm::normalize(glm::vec2(
+                                   // TODO Access window from layer
+                                   Frameio::Input::GetMouseX() / 1280 * 2 - 1,
+                                   Frameio::Input::GetMouseY() / 720 /* m_Window->GetHeight( )*/ * 2 - 1))));
 
-    if (Frameio::Input::IsKeyDown(FR_KEY_W))
-      m_Camera.SetPosition(m_Camera.GetPosition() + m_CameraMoveDirection);
+    if (Frameio::Input::IsKeyDown(FR_KEY_W)) m_Camera.SetPosition(m_Camera.GetPosition() + m_CameraMoveDirection);
 
     if (Frameio::Input::IsKeyDown(FR_KEY_A))
-      m_Camera
-          .SetPosition(m_Camera.GetPosition() + glm::vec3(-m_CameraMoveSpeed * realDeltaTime, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, glm::half_pi<float>()) */);
+      m_Camera.SetPosition(m_Camera.GetPosition() +
+                           glm::vec3(-m_CameraMoveSpeed * realDeltaTime,
+                                     0.0f,
+                                     0.0f) /* glm::rotateZ(m_CameraMoveDirection, glm::half_pi<float>()) */);
 
     if (Frameio::Input::IsKeyDown(FR_KEY_S))
       m_Camera.SetPosition(m_Camera.GetPosition() + glm::rotateZ(m_CameraMoveDirection, glm::pi<float>()));
 
     if (Frameio::Input::IsKeyDown(FR_KEY_D))
-      m_Camera.SetPosition(m_Camera.GetPosition() + glm::vec3(m_CameraMoveSpeed * realDeltaTime, 0.0f, 0.0f) /* glm::rotateZ(m_CameraMoveDirection, -glm::half_pi<float>()) */);
-    // clang-format on
+      m_Camera.SetPosition(m_Camera.GetPosition() +
+                           glm::vec3(m_CameraMoveSpeed * realDeltaTime,
+                                     0.0f,
+                                     0.0f) /* glm::rotateZ(m_CameraMoveDirection, -glm::half_pi<float>()) */);
 
     // m_Camera.SetRotation(glm::degrees(glm::orientedAngle(
     //     glm::vec2(0.0f, -1.0f),
