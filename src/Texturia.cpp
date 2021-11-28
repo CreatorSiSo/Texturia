@@ -15,17 +15,9 @@
 
 namespace Texturia {
 
-// TODO find out how to use m_NodesTree in here
-// TODO display more information about the Node by getting its data from m_NodesTree
-//! The displayed ID might not be the same as the one saved in our Node object because we use uint64_t and not int
-void MiniMapNodeHoverCallback(int nodeUUID, void* userData)
-{
-  ImGui::SetTooltip("Node UUID: %d", nodeUUID);
-}
-
-class GuiLayer : public Frameio::Layer {
+class ViewportLayer : public Frameio::Layer {
 public:
-  GuiLayer()
+  ViewportLayer()
       : Layer("Texturia: Gui"),
         m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
         m_CameraMoveDirection(0.0f),
@@ -138,14 +130,6 @@ public:
       )";
 
     m_Shader.reset(Frameio::Shader::Create(vertexSource, fragSrcFlatColor));
-
-    m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
-    m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
-    //! This UUID causes ImNodes to use -2147483648 because of integer overflow
-    m_NodesTree->AddNode(Node("Old Node 2", 2147483648));
-
-    m_NodesTree->AddNode(Node("New Node 1", Frameio::UUID(Frameio::Int32Range)));
-    m_NodesTree->AddNode(Node("New Node 2", Frameio::UUID(Frameio::Int32Range)));
   }
 
   void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
@@ -212,17 +196,71 @@ public:
 
   void OnImGuiRender() override
   {
-    ImGui::DockSpaceOverViewport();
+    ImGui::Begin("Renderer Debug");
+    ImGui::PushID("Triangle");
+    ImGui::Text("Triangle");
+    ImGui::DragFloat3("Position", m_TrianglePosition);
+    // TODO Implement rotation of objects
+    ImGui::DragFloat3("Rotation", m_TrianglePosition);
+    ImGui::DragFloat3("Scale", m_TriangleScale, 1.0f);
+    ImGui::PopID();
+    ImGui::PushID("Background");
+    ImGui::Text("Background");
+    ImGui::DragFloat3("Position", m_BackgroundPosition);
+    // TODO Implement rotation of objects
+    ImGui::DragFloat3("Rotation", m_BackgroundPosition);
+    ImGui::DragFloat3("Scale", m_BackgroundScale, 1.0f);
+    ImGui::PopID();
 
+    ImGui::End();
+  }
+
+private:
+  float m_Time = 0.0f;
+
+  Frameio::OrthographicCamera m_Camera;
+  float m_CameraMoveSpeed = 1.5f;
+
+  glm::vec3 m_CameraMoveDirection;
+  Frameio::Ref<Frameio::Shader> m_Shader;
+  Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
+  glm::vec3 m_TrianglePosition;
+  glm::vec3 m_TriangleScale;
+  Frameio::Ref<Frameio::VertexArray> m_BackgroundVertexArray;
+  glm::vec3 m_BackgroundPosition;
+  glm::vec3 m_BackgroundScale;
+};
+
+// TODO find out how to use m_NodesTree in here
+// TODO display more information about the Node by getting its data from m_NodesTree
+//! The displayed ID might not be the same as the one saved in our Node object because we use uint64_t and not int
+void MiniMapNodeHoverCallback(int nodeUUID, void* userData)
+{
+  ImGui::SetTooltip("Node UUID: %d", nodeUUID);
+}
+
+class GuiLayer : public Frameio::Layer {
+public:
+  GuiLayer() : Layer("Texturia: Gui")
+  {
+    m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
+    m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
+    //! This UUID causes ImNodes to use -2147483648 because of integer overflow
+    m_NodesTree->AddNode(Node("Old Node 2", 2147483648));
+
+    m_NodesTree->AddNode(Node("New Node 1", Frameio::UUID(Frameio::Int32Range)));
+    m_NodesTree->AddNode(Node("New Node 2", Frameio::UUID(Frameio::Int32Range)));
+  }
+
+  void OnImGuiRender() override
+  {
     static bool showDemoWindow = false;
     static bool showMetricsWindow = true;
-    static bool showRendererDebugWindow = true;
     static bool showNodesEditorWindow = true;
 
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("View")) {
         if (ImGui::MenuItem("ImGui Demo")) showDemoWindow = showDemoWindow ? false : true;
-        if (ImGui::MenuItem("Renderer Debug")) showRendererDebugWindow = showRendererDebugWindow ? false : true;
         if (ImGui::MenuItem("Metrics")) showMetricsWindow = showMetricsWindow ? false : true;
         if (ImGui::MenuItem("Nodes Editor")) showMetricsWindow = showNodesEditorWindow ? false : true;
         ImGui::EndMenu();
@@ -247,26 +285,6 @@ public:
     if (showDemoWindow) ImGui::ShowDemoWindow(&showDemoWindow);
 
     if (showMetricsWindow) ImGui::ShowMetricsWindow(&showMetricsWindow);
-
-    if (showRendererDebugWindow) {
-      ImGui::Begin("Renderer Debug", &showRendererDebugWindow);
-      ImGui::PushID("Triangle");
-      ImGui::Text("Triangle");
-      ImGui::DragFloat3("Position", m_TrianglePosition);
-      // TODO Implement rotation of objects
-      ImGui::DragFloat3("Rotation", m_TrianglePosition);
-      ImGui::DragFloat3("Scale", m_TriangleScale, 1.0f);
-      ImGui::PopID();
-      ImGui::PushID("Background");
-      ImGui::Text("Background");
-      ImGui::DragFloat3("Position", m_BackgroundPosition);
-      // TODO Implement rotation of objects
-      ImGui::DragFloat3("Rotation", m_BackgroundPosition);
-      ImGui::DragFloat3("Scale", m_BackgroundScale, 1.0f);
-      ImGui::PopID();
-
-      ImGui::End();
-    }
 
     // // Note that since many nodes can be selected at once, we first need to query the number of
     // // selected nodes before getting them.
@@ -316,26 +334,16 @@ public:
   }
 
 private:
-  float m_Time = 0.0f;
-
-  Frameio::OrthographicCamera m_Camera;
-  float m_CameraMoveSpeed = 1.5f;
-
-  glm::vec3 m_CameraMoveDirection;
-  Frameio::Ref<Frameio::Shader> m_Shader;
-  Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
-  glm::vec3 m_TrianglePosition;
-  glm::vec3 m_TriangleScale;
-  Frameio::Ref<Frameio::VertexArray> m_BackgroundVertexArray;
-  glm::vec3 m_BackgroundPosition;
-  glm::vec3 m_BackgroundScale;
-
   Frameio::Ref<NodesTree> m_NodesTree;
 };
 
 class TexturiaApp : public Frameio::App {
 public:
-  TexturiaApp() { PushOverlay(new GuiLayer()); }
+  TexturiaApp()
+  {
+    PushLayer(new ViewportLayer());
+    PushOverlay(new GuiLayer());
+  }
 
   ~TexturiaApp() = default;
 };
