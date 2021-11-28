@@ -137,7 +137,7 @@ public:
         }
       )";
 
-    m_Shader.reset(new Frameio::Shader(vertexSource, fragSrcFlatColor));
+    m_Shader.reset(Frameio::Shader::Create(vertexSource, fragSrcFlatColor));
 
     m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
     m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
@@ -190,14 +190,17 @@ public:
 
     Frameio::Renderer::BeginScene(m_Camera);
 
-    m_Shader->UploadUniformFloat4("u_FlatColor", { 0.8f, 0.1f, 0.2f, 1.0f });
+    m_Shader->Bind();
+    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_FlatColor",
+                                                                                    { 0.8f, 0.1f, 0.2f, 1.0f });
     Frameio::Renderer::Submit(
         m_BackgroundVertexArray,
         m_Shader,
         glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0], m_BackgroundPosition[1], m_BackgroundPosition[2])),
                    glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1], m_BackgroundScale[2])));
 
-    m_Shader->UploadUniformFloat4("u_FlatColor", { 0.1f, 0.2f, 0.8f, 1.0f });
+    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_FlatColor",
+                                                                                    { 0.1f, 0.2f, 0.8f, 1.0f });
     Frameio::Renderer::Submit(
         m_TriangleVertexArray,
         m_Shader,
