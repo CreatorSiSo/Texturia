@@ -101,46 +101,43 @@ public:
         uniform mat4 u_ViewProjectionMatrix;
         uniform mat4 u_TransformMatrix;
 
-        out vec3 s_Position;
-        out vec4 s_Color;
+        out vec3 v_Position;
+        out vec4 v_Color;
 
         void main() {
-          s_Position = a_Position;
-          s_Color = a_Color;
+          v_Position = a_Position;
+          v_Color = a_Color;
           gl_Position = u_ViewProjectionMatrix * u_TransformMatrix * vec4(a_Position, 1.0);
         }
       )";
 
-    std::string fragmentSource =
+    std::string fragSrcVertexColor =
         R"(
         #version 330 core
 
         layout(location = 0) out vec4 o_Color;
 
-        in vec3 s_Position;
-        in vec4 s_Color;
+        in vec4 v_Color;
 
         void main() {
-          // o_Color = vec4(s_Position, 1.0);
-          o_Color = s_Color;
+          o_Color = v_Color;
         }
       )";
 
-    std::string fragmentSourcePos = R"(
-            #version 330 core
+    std::string fragSrcFlatColor =
+        R"(
+        #version 330 core
 
-            layout(location = 0) out vec4 o_Color;
+        layout(location = 0) out vec4 o_Color;
 
-            in vec3 s_Position;
-            in vec4 s_Color;
+        uniform vec4 u_FlatColor;
 
-            void main() {
-              o_Color = mix(s_Color, vec4(s_Position, 1.0), 0.3);
-            }
-          )";
+        void main() {
+          o_Color = u_FlatColor;
+        }
+      )";
 
-    m_Shader.reset(new Frameio::Shader(vertexSource, fragmentSource));
-    m_ShaderPos.reset(new Frameio::Shader(vertexSource, fragmentSourcePos));
+    m_Shader.reset(new Frameio::Shader(vertexSource, fragSrcFlatColor));
 
     m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
     m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
@@ -193,14 +190,17 @@ public:
 
     Frameio::Renderer::BeginScene(m_Camera);
 
+    m_Shader->UploadUniformFloat4("u_FlatColor", { 0.8f, 0.1f, 0.2f, 1.0f });
     Frameio::Renderer::Submit(
         m_BackgroundVertexArray,
         m_Shader,
         glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0], m_BackgroundPosition[1], m_BackgroundPosition[2])),
                    glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1], m_BackgroundScale[2])));
+
+    m_Shader->UploadUniformFloat4("u_FlatColor", { 0.1f, 0.2f, 0.8f, 1.0f });
     Frameio::Renderer::Submit(
         m_TriangleVertexArray,
-        m_ShaderPos,
+        m_Shader,
         glm::scale(glm::translate(glm::vec3(m_TrianglePosition[0], m_TrianglePosition[1], m_TrianglePosition[2])),
                    glm::vec3(m_TriangleScale[0], m_TriangleScale[1], m_TriangleScale[2])));
 
@@ -320,7 +320,6 @@ private:
 
   glm::vec3 m_CameraMoveDirection;
   Frameio::Ref<Frameio::Shader> m_Shader;
-  Frameio::Ref<Frameio::Shader> m_ShaderPos;
   Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
   glm::vec3 m_TrianglePosition;
   glm::vec3 m_TriangleScale;
