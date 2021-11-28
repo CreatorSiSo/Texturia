@@ -26,9 +26,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin/${CMAKE_BUILD_TYPE})
 
 # Source Files
-set(SOURCES
-  ./src/Nodes.cpp
-  ./src/Texturia.cpp)
+file(GLOB_RECURSE SOURCES ./src/*.cpp)
 
 
 # Targets
@@ -64,7 +62,7 @@ target_link_libraries(${PROJECT_NAME} frameio)
 # Precompiled Headers
 target_precompile_headers(${PROJECT_NAME} PRIVATE ./src/txpch.hpp)
 
-# Post Build
+# Pre Build
 add_custom_command(
   TARGET ${PROJECT_NAME}
   PRE_BUILD
