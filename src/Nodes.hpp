@@ -22,6 +22,7 @@ struct VariantToString {
 using NodeSocketType = std::variant<bool, int, float, char, std::string>;
 
 struct NodeSocket {
+  Frameio::UUID UUID;
   std::string Label;
   NodeSocketType Value;
 
@@ -40,16 +41,10 @@ struct Node {
   std::string Label;
   Frameio::UUID UUID;
 
-  Node(const std::string& label = "Default Node", Frameio::UUID uuid = Frameio::UUID()) : Label(label), UUID(uuid)
-  {
-    m_NodeSockets.push_back(NodeSocket("Bool", true));
-    m_NodeSockets.push_back(NodeSocket("Int", 1));
-    m_NodeSockets.push_back(NodeSocket("Float", 1.0f));
-    m_NodeSockets.push_back(NodeSocket("Char", 'c'));
-    m_NodeSockets.push_back(NodeSocket("String", "string"));
-  }
-
+  Node(const std::string& label = "Default Node", Frameio::UUID uuid = Frameio::UUID());
   ~Node() = default;
+
+  virtual void OnImGuiRender();
 
   inline std::string ToString() const
   {
@@ -81,11 +76,11 @@ public:
   NodesTree(std::string label = "Default Node Tree") : m_Label(label) {}
   ~NodesTree() = default;
 
-  Frameio::UUID AddNode();
-  // Frameio::UUID AddNode(const Node& node);
+  void AddNode(const Node& node);
   // Frameio::Ref<Node> GetNodeRef(const Frameio::UUID& uuid);
   void DeleteNode(const Frameio::UUID& uuid);
   void Clear();
+  void OnImGuiRender();
 
   inline std::string ToString() const
   {

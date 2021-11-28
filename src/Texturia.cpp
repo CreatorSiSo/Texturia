@@ -15,9 +15,12 @@
 
 namespace Texturia {
 
-void miniMapNodeHoverCallback(int nodeID, void* userData)
+// TODO find out how to use m_NodesTree in here
+// TODO display more information about the Node by getting its data from m_NodesTree
+//! The displayed ID might not be the same as the one saved in our Node object because we use uint64_t and not int
+void MiniMapNodeHoverCallback(int nodeUUID, void* userData)
 {
-  ImGui::SetTooltip("This is node %d", nodeID);
+  ImGui::SetTooltip("Node UUID: %d !Not always correct!", nodeUUID);
 }
 
 class GuiLayer : public Frameio::Layer {
@@ -138,6 +141,14 @@ public:
 
     m_Shader.reset(new Frameio::Shader(vertexSource, fragmentSource));
     m_ShaderPos.reset(new Frameio::Shader(vertexSource, fragmentSourcePos));
+
+    m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
+    //! These UUIDs cause ImNodes to have different ones because it uses just integers
+    m_NodesTree->AddNode(Node("Node 1", 432199990000));
+    m_NodesTree->AddNode(Node("Node 2", 123466660000));
+
+    m_NodesTree->AddNode(Node("New Node 1"));
+    m_NodesTree->AddNode(Node("New Node 2"));
   }
 
   void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
@@ -255,45 +266,32 @@ public:
       ImGui::End();
     }
 
-    static float value1 = 0.0f;
+    // // Note that since many nodes can be selected at once, we first need to query the number of
+    // // selected nodes before getting them.
+    // static std::vector<int> selectedNodes;
+    // const int numberSelectedNodes = ImNodes::NumSelectedNodes();
+    // if (numberSelectedNodes > 0) {
+    //   selectedNodes.resize(numberSelectedNodes);
+    //   ImNodes::GetSelectedNodes(selectedNodes.data());
+    // } else {
+    //   selectedNodes.clear();
+    // }
+
     if (showNodesEditorWindow) {
       static std::vector<std::pair<int, int>> links;
-      static const Frameio::UUID hardcodedNodeID;
-      static const Frameio::UUID OutAttributeID;
-      static const Frameio::UUID InAttributeID;
 
       ImGui::Begin("Nodes Editor");
       ImNodes::BeginNodeEditor();
 
-      ImNodes::BeginNode(hardcodedNodeID);
-      ImNodes::BeginNodeTitleBar();
-      ImGui::TextUnformatted("Test Node");
-      ImNodes::EndNodeTitleBar();
+      // static bool printedMainNodesTree = false;
+      // if (!printedMainNodesTree) {
+      //   FR_INFO("{0}", *m_NodesTree);
+      //   printedMainNodesTree = true;
+      // }
 
-      ImNodes::BeginOutputAttribute(2, ImNodesPinShape_TriangleFilled);
-      ImGui::Text("Output Socket");
-      ImNodes::EndOutputAttribute();
-      ImNodes::BeginInputAttribute(3, ImNodesPinShape_QuadFilled);
+      m_NodesTree->OnImGuiRender();
 
-      ImGui::Text("Input Socket");
-      ImNodes::EndInputAttribute();
-      ImNodes::EndNode();
-
-      ImNodes::BeginNode(4);
-      ImNodes::BeginNodeTitleBar();
-      ImGui::TextUnformatted("Test Node");
-      ImNodes::EndNodeTitleBar();
-
-      ImNodes::BeginOutputAttribute(5);
-      ImGui::Text("Output Socket");
-      ImNodes::EndOutputAttribute();
-      ImNodes::BeginInputAttribute(6);
-
-      ImGui::Text("Input Socket");
-      ImNodes::EndInputAttribute();
-      ImNodes::EndNode();
-
-      ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_BottomLeft, miniMapNodeHoverCallback);
+      ImNodes::MiniMap(0.2f, ImNodesMiniMapLocation_BottomLeft, MiniMapNodeHoverCallback);
 
       for (int i = 0; i < links.size(); ++i) {
         const std::pair<int, int> link = links[i];
@@ -302,6 +300,7 @@ public:
 
       ImNodes::EndNodeEditor();
 
+      // TODO Integrate linking in own Nodes API with own UUIDs
       int start_attr, end_attr;
       if (ImNodes::IsLinkCreated(&start_attr, &end_attr)) { links.push_back(std::make_pair(start_attr, end_attr)); }
 
@@ -335,19 +334,13 @@ private:
   Frameio::Ref<Frameio::VertexArray> m_BackgroundVertexArray;
   glm::vec3 m_BackgroundPosition;
   glm::vec3 m_BackgroundScale;
+
+  Frameio::Ref<NodesTree> m_NodesTree;
 };
 
 class TexturiaApp : public Frameio::App {
 public:
-  TexturiaApp()
-  {
-    NodesTree mainNodesTree;
-
-    mainNodesTree.AddNode();
-    FR_INFO("{0}", mainNodesTree);
-
-    PushOverlay(new GuiLayer());
-  }
+  TexturiaApp() { PushOverlay(new GuiLayer()); }
 
   ~TexturiaApp() = default;
 };
