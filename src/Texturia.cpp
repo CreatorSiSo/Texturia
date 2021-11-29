@@ -22,33 +22,35 @@ public:
         m_Camera(-1.6f, 1.6f, -0.9f, 0.9f),
         m_CameraMoveDirection(0.0f),
         m_BackgroundPosition(0.0f),
-        m_BackgroundScale(1.0f),
-        m_TrianglePosition(0.0f),
+        m_BackgroundScale(1.5f),
+        m_TrianglePosition(-0.2f),
         m_TriangleScale(1.0f)
   {
+    Frameio::BufferLayout bufferLayout = {
+      {Frameio::ShaderDataType::Float3,     "a_Position"},
+      {Frameio::ShaderDataType::Float2, "a_TextureCoord"},
+      {Frameio::ShaderDataType::Float4,        "a_Color"}
+    };
+
     // TRIANGLE
     m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
 
-    float triangleVertices[3 * 7] = {
+    float triangleVertices[3 * 9] = {
       // clang-format off
-         0.0f,  0.5f, 0.0f, 0.1f, 0.6f, 1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
-        -0.5f, -0.5f, 0.0f, 0.4f, 0.1f, 1.0f, 1.0f
+      //    x,     y,    z,     u,     v,    r,    g,    b,    a
+         0.0f,  0.5f, 0.0f,  0.0f,  1.0f, 0.1f, 0.6f, 1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,  1.0f, -1.0f, 0.2f, 0.3f, 0.9f, 1.0f,
+        -0.5f, -0.5f, 0.0f, -1.0f, -1.0f, 0.4f, 0.1f, 1.0f, 1.0f
       // clang-format on
     };
+
+    uint32_t triangleIndices[3] = { 0, 1, 2 };
 
     Frameio::Ref<Frameio::VertexBuffer> triangleVertexBuffer;
     triangleVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(triangleVertices), triangleVertices));
 
-    Frameio::BufferLayout layout = {
-      {Frameio::ShaderDataType::Float3, "a_Position"},
-      {Frameio::ShaderDataType::Float4,    "a_Color"}
-    };
-
-    triangleVertexBuffer->SetLayout(layout);
+    triangleVertexBuffer->SetLayout(bufferLayout);
     m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
-
-    uint32_t triangleIndices[3] = { 0, 1, 2 };
 
     Frameio::Ref<Frameio::IndexBuffer> triangleIndexBuffer;
     triangleIndexBuffer.reset(
@@ -60,22 +62,23 @@ public:
     // SQUARE
     m_BackgroundVertexArray.reset(Frameio::VertexArray::Create());
 
-    float squareVertices[4 * 7] = {
+    float squareVertices[4 * 9] = {
       // clang-format off
-        -1.6f,  0.9f, 0.0f, 0.7f, 0.3f, 0.2f, 1.0f,
-         1.6f,  0.9f, 0.0f, 0.9f, 0.3f, 0.3f, 1.0f,
-         1.6f, -0.9f, 0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
-        -1.6f, -0.9f, 0.0f, 0.8f, 0.2f, 0.2f, 1.0f
+      //    x,     y,    z,     u,     v,    r,    g,    b,    a
+        -0.5f,  0.5f, 0.0f, -1.0f,  1.0f, 0.7f, 0.3f, 0.2f, 1.0f,
+         0.5f,  0.5f, 0.0f,  1.0f,  1.0f, 0.9f, 0.3f, 0.3f, 1.0f,
+         0.5f, -0.5f, 0.0f,  1.0f, -1.0f, 0.7f, 0.4f, 0.2f, 1.0f,
+        -0.5f, -0.5f, 0.0f, -1.0f, -1.0f, 0.8f, 0.2f, 0.2f, 1.0f
       // clang-format on
     };
+
+    uint32_t squareIndices[6] = { 0, 1, 2, 0, 3, 2 };
 
     Frameio::Ref<Frameio::VertexBuffer> squareVertexBuffer;
     squareVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices));
 
-    squareVertexBuffer->SetLayout(layout);
+    squareVertexBuffer->SetLayout(bufferLayout);
     m_BackgroundVertexArray->AddVertexBuffer(squareVertexBuffer);
-
-    uint32_t squareIndices[6] = { 0, 1, 2, 0, 3, 2 };
 
     Frameio::Ref<Frameio::IndexBuffer> squareIndexBuffer;
     squareIndexBuffer.reset(Frameio::IndexBuffer::Create(sizeof(squareIndices) / sizeof(uint32_t), squareIndices));
@@ -88,18 +91,34 @@ public:
         #version 330 core
 
         layout(location = 0) in vec3 a_Position;
-        layout(location = 1) in vec4 a_Color;
+        layout(location = 1) in vec2 a_TextureCoord;
+        layout(location = 2) in vec4 a_Color;
 
         uniform mat4 u_ViewProjectionMatrix;
         uniform mat4 u_TransformMatrix;
 
         out vec3 v_Position;
+        out vec2 v_TextureCoord;
         out vec4 v_Color;
 
         void main() {
           v_Position = a_Position;
+          v_TextureCoord = a_TextureCoord;
           v_Color = a_Color;
           gl_Position = u_ViewProjectionMatrix * u_TransformMatrix * vec4(a_Position, 1.0);
+        }
+      )";
+
+    std::string fragSrcTextureCoord =
+        R"(
+        #version 330 core
+
+        layout(location = 0) out vec4 o_Color;
+
+        in vec2 v_TextureCoord;
+
+        void main() {
+          o_Color = vec4(v_TextureCoord, 0.0, 1.0);
         }
       )";
 
@@ -129,7 +148,9 @@ public:
         }
       )";
 
-    m_Shader.reset(Frameio::Shader::Create(vertexSource, fragSrcFlatColor));
+    m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcTextureCoord));
+    // m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcVertexColor));
+    // m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcFlatColor));
   }
 
   void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
@@ -174,22 +195,19 @@ public:
 
     Frameio::Renderer::BeginScene(m_Camera);
 
-    m_Shader->Bind();
-    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_FlatColor",
-                                                                                    { 0.8f, 0.1f, 0.2f, 1.0f });
-    Frameio::Renderer::Submit(
-        m_BackgroundVertexArray,
-        m_Shader,
-        glm::scale(glm::translate(glm::vec3(m_BackgroundPosition[0], m_BackgroundPosition[1], m_BackgroundPosition[2])),
-                   glm::vec3(m_BackgroundScale[0], m_BackgroundScale[1], m_BackgroundScale[2])));
+    m_DebugShader->Bind();
 
-    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_Shader)->UploadUniformFloat4("u_FlatColor",
-                                                                                    { 0.1f, 0.2f, 0.8f, 1.0f });
+    // Square
+    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
+        ->UploadUniformFloat4("u_FlatColor", { 0.8f, 0.1f, 0.2f, 1.0f });
     Frameio::Renderer::Submit(
-        m_TriangleVertexArray,
-        m_Shader,
-        glm::scale(glm::translate(glm::vec3(m_TrianglePosition[0], m_TrianglePosition[1], m_TrianglePosition[2])),
-                   glm::vec3(m_TriangleScale[0], m_TriangleScale[1], m_TriangleScale[2])));
+        m_BackgroundVertexArray, m_DebugShader, glm::scale(glm::translate(m_BackgroundPosition), m_BackgroundScale));
+
+    // Triangle
+    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
+        ->UploadUniformFloat4("u_FlatColor", { 0.1f, 0.2f, 0.8f, 1.0f });
+    Frameio::Renderer::Submit(
+        m_TriangleVertexArray, m_DebugShader, glm::scale(glm::translate(m_TrianglePosition), m_TriangleScale));
 
     Frameio::Renderer::EndScene();
   }
@@ -222,7 +240,7 @@ private:
   float m_CameraMoveSpeed = 1.5f;
 
   glm::vec3 m_CameraMoveDirection;
-  Frameio::Ref<Frameio::Shader> m_Shader;
+  Frameio::Ref<Frameio::Shader> m_DebugShader;
   Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
   glm::vec3 m_TrianglePosition;
   glm::vec3 m_TriangleScale;
@@ -256,7 +274,7 @@ public:
   {
     static bool showDemoWindow = false;
     static bool showMetricsWindow = true;
-    static bool showNodesEditorWindow = true;
+    static bool showNodesEditorWindow = false;
 
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("View")) {
