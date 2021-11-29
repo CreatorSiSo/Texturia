@@ -38,9 +38,9 @@ public:
     float triangleVertices[3 * 9] = {
       // clang-format off
       //    x,     y,    z,     u,     v,    r,    g,    b,    a
-         0.0f,  0.5f, 0.0f,  0.0f,  1.0f, 0.1f, 0.6f, 1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,  1.0f, -1.0f, 0.2f, 0.3f, 0.9f, 1.0f,
-        -0.5f, -0.5f, 0.0f, -1.0f, -1.0f, 0.4f, 0.1f, 1.0f, 1.0f
+         0.0f,  0.5f, 0.0f,  0.5f,  1.0f, 0.1f, 0.6f, 1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.2f, 0.3f, 0.9f, 1.0f,
+        -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, 0.4f, 0.1f, 1.0f, 1.0f
       // clang-format on
     };
 
@@ -65,10 +65,10 @@ public:
     float squareVertices[4 * 9] = {
       // clang-format off
       //    x,     y,    z,     u,     v,    r,    g,    b,    a
-        -0.5f,  0.5f, 0.0f, -1.0f,  1.0f, 0.7f, 0.3f, 0.2f, 1.0f,
+        -0.5f,  0.5f, 0.0f,  0.0f,  1.0f, 0.7f, 0.3f, 0.2f, 1.0f,
          0.5f,  0.5f, 0.0f,  1.0f,  1.0f, 0.9f, 0.3f, 0.3f, 1.0f,
-         0.5f, -0.5f, 0.0f,  1.0f, -1.0f, 0.7f, 0.4f, 0.2f, 1.0f,
-        -0.5f, -0.5f, 0.0f, -1.0f, -1.0f, 0.8f, 0.2f, 0.2f, 1.0f
+         0.5f, -0.5f, 0.0f,  1.0f,  0.0f, 0.7f, 0.4f, 0.2f, 1.0f,
+        -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, 0.8f, 0.2f, 0.2f, 1.0f
       // clang-format on
     };
 
@@ -148,9 +148,29 @@ public:
         }
       )";
 
-    m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcTextureCoord));
-    // m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcVertexColor));
-    // m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcFlatColor));
+    std::string fragSrcTexture =
+        R"(
+        #version 330 core
+
+        layout(location = 0) out vec4 o_Color;
+
+        in vec2 v_TextureCoord;
+
+        uniform sampler2D u_Texture;
+
+        void main() {
+          o_Color = texture(u_Texture, v_TextureCoord);
+        }
+      )";
+
+    m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcVertexColor));
+    m_TextureShader.reset(Frameio::Shader::Create(vertexSource, fragSrcTexture));
+
+    m_GridTexture = Frameio::Texture2D::Create("assets/textures/Grid.png");
+    m_GridWithDotTexture = Frameio::Texture2D::Create("assets/textures/GridWithDot.png");
+
+    m_TextureShader->Bind();
+    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 2);
   }
 
   void OnUpdate(Frameio::RealDeltaTime realDeltaTime) override
@@ -195,19 +215,22 @@ public:
 
     Frameio::Renderer::BeginScene(m_Camera);
 
-    m_DebugShader->Bind();
+    // Background
+    // std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
+    //     ->UploadUniformFloat4("u_FlatColor", { 0.8f, 0.1f, 0.2f, 1.0f });
+    Frameio::Renderer::Submit(m_BackgroundVertexArray, m_DebugShader, glm::scale(glm::vec3(1.6f * 2, 0.9f * 2, 1.0f)));
 
     // Square
-    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
-        ->UploadUniformFloat4("u_FlatColor", { 0.8f, 0.1f, 0.2f, 1.0f });
+    m_GridWithDotTexture->Bind(2);
     Frameio::Renderer::Submit(
-        m_BackgroundVertexArray, m_DebugShader, glm::scale(glm::translate(m_BackgroundPosition), m_BackgroundScale));
+        m_BackgroundVertexArray, m_TextureShader, glm::scale(glm::translate(m_BackgroundPosition), m_BackgroundScale));
 
     // Triangle
-    std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
-        ->UploadUniformFloat4("u_FlatColor", { 0.1f, 0.2f, 0.8f, 1.0f });
+    m_GridTexture->Bind(2);
+    // std::dynamic_pointer_cast<Frameio::OpenGLShader>(m_DebugShader)
+    //     ->UploadUniformFloat4("u_FlatColor", { 0.1f, 0.2f, 0.8f, 1.0f });
     Frameio::Renderer::Submit(
-        m_TriangleVertexArray, m_DebugShader, glm::scale(glm::translate(m_TrianglePosition), m_TriangleScale));
+        m_TriangleVertexArray, m_TextureShader, glm::scale(glm::translate(m_TrianglePosition), m_TriangleScale));
 
     Frameio::Renderer::EndScene();
   }
@@ -240,7 +263,8 @@ private:
   float m_CameraMoveSpeed = 1.5f;
 
   glm::vec3 m_CameraMoveDirection;
-  Frameio::Ref<Frameio::Shader> m_DebugShader;
+  Frameio::Ref<Frameio::Texture2D> m_GridTexture, m_GridWithDotTexture;
+  Frameio::Ref<Frameio::Shader> m_DebugShader, m_TextureShader;
   Frameio::Ref<Frameio::VertexArray> m_TriangleVertexArray;
   glm::vec3 m_TrianglePosition;
   glm::vec3 m_TriangleScale;
