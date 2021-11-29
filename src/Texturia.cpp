@@ -33,7 +33,7 @@ public:
     };
 
     // TRIANGLE
-    m_TriangleVertexArray.reset(Frameio::VertexArray::Create());
+    m_TriangleVertexArray = Frameio::VertexArray::Create();
 
     float triangleVertices[3 * 9] = {
       // clang-format off
@@ -47,20 +47,19 @@ public:
     uint32_t triangleIndices[3] = { 0, 1, 2 };
 
     Frameio::Ref<Frameio::VertexBuffer> triangleVertexBuffer;
-    triangleVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(triangleVertices), triangleVertices));
+    triangleVertexBuffer = Frameio::VertexBuffer::Create(sizeof(triangleVertices), triangleVertices);
 
     triangleVertexBuffer->SetLayout(bufferLayout);
     m_TriangleVertexArray->AddVertexBuffer(triangleVertexBuffer);
 
     Frameio::Ref<Frameio::IndexBuffer> triangleIndexBuffer;
-    triangleIndexBuffer.reset(
-        Frameio::IndexBuffer::Create(sizeof(triangleIndices) / sizeof(uint32_t), triangleIndices));
+    triangleIndexBuffer = Frameio::IndexBuffer::Create(sizeof(triangleIndices) / sizeof(uint32_t), triangleIndices);
 
     m_TriangleVertexArray->SetIndexBuffer(triangleIndexBuffer);
     // END TRIANGLE
 
     // SQUARE
-    m_BackgroundVertexArray.reset(Frameio::VertexArray::Create());
+    m_BackgroundVertexArray = Frameio::VertexArray::Create();
 
     float squareVertices[4 * 9] = {
       // clang-format off
@@ -75,13 +74,13 @@ public:
     uint32_t squareIndices[6] = { 0, 1, 2, 0, 3, 2 };
 
     Frameio::Ref<Frameio::VertexBuffer> squareVertexBuffer;
-    squareVertexBuffer.reset(Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices));
+    squareVertexBuffer = Frameio::VertexBuffer::Create(sizeof(squareVertices), squareVertices);
 
     squareVertexBuffer->SetLayout(bufferLayout);
     m_BackgroundVertexArray->AddVertexBuffer(squareVertexBuffer);
 
     Frameio::Ref<Frameio::IndexBuffer> squareIndexBuffer;
-    squareIndexBuffer.reset(Frameio::IndexBuffer::Create(sizeof(squareIndices) / sizeof(uint32_t), squareIndices));
+    squareIndexBuffer = Frameio::IndexBuffer::Create(sizeof(squareIndices) / sizeof(uint32_t), squareIndices);
 
     m_BackgroundVertexArray->SetIndexBuffer(squareIndexBuffer);
     // END SQUARE
@@ -163,8 +162,8 @@ public:
         }
       )";
 
-    m_DebugShader.reset(Frameio::Shader::Create(vertexSource, fragSrcVertexColor));
-    m_TextureShader.reset(Frameio::Shader::Create(vertexSource, fragSrcTexture));
+    m_DebugShader = Frameio::Shader::Create(vertexSource, fragSrcVertexColor);
+    m_TextureShader = Frameio::Shader::Create(vertexSource, fragSrcTexture);
 
     m_GridTexture = Frameio::Texture2D::Create("assets/textures/Grid.png");
     m_GridWithDotTexture = Frameio::Texture2D::Create("assets/textures/GridWithDot.png");
@@ -285,7 +284,7 @@ class GuiLayer : public Frameio::Layer {
 public:
   GuiLayer() : Layer("Texturia: Gui")
   {
-    m_NodesTree.reset(new NodesTree("Main Nodes Tree"));
+    m_NodesTree = std::make_shared<NodesTree>("Main Nodes Tree");
     m_NodesTree->AddNode(Node("Old Node 1", 2147483647));
     //! This UUID causes ImNodes to use -2147483648 because of integer overflow
     m_NodesTree->AddNode(Node("Old Node 2", 2147483648));
