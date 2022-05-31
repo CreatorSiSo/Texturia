@@ -1,31 +1,24 @@
-## OSX artifacts
-.DS_Store
-
-## Visual Studio artifacts
-.vs
-ipch
-*.opensdf
+# Logs
+logs
 *.log
-*.pdb
-*.ilk
-*.user
-*.sdf
-*.suo
-*.VC.db
-*.VC.VC.opendb
-*.vcxproj
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-## Xcode artifacts
-project.xcworkspace
-xcuserdata
+node_modules
+dist
+dist-ssr
+*.local
 
-## JetBrains IDE artifacts
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
 .idea
-cmake-build-*
-
-## Dear ImGui artifacts
-imgui.ini
-
-# Build Output
-bin
-build
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

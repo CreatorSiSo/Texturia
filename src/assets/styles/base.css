@@ -1,0 +1,24 @@
+html {
+	font-size: 62.5%;
+	cursor: default;
+}
+
+body {
+	font-size: 1.6rem;
+}
+
+html,
+body {
+	height: 100%;
+	background-color: #1f1f1f;
+}
+
+@media (prefers-color-scheme: dark) {
+	html {
+		color-scheme: dark;
+	}
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
