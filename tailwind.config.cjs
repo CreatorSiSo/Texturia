@@ -20,6 +20,7 @@ module.exports = {
 		},
 		extend: {
 			colors: {
+				background: '#1f1f1f',
 				'elevation-0': '#222222',
 				'elevation-1': '#292929',
 				'elevation-2': '#2F2F2F',

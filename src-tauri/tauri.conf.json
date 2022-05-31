@@ -55,11 +55,13 @@
 		},
 		"windows": [
 			{
-				"fullscreen": false,
-				"height": 600,
-				"resizable": true,
 				"title": "Texturia",
-				"width": 800
+				"fullscreen": false,
+				"resizable": true,
+				"decorations": false,
+				"height": 600,
+				"width": 800,
+				"transparent": true
 			}
 		]
 	}
