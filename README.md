@@ -1,2 +1,0 @@
-# Texturia
-> Procedural texture generator.
