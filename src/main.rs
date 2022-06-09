@@ -20,13 +20,14 @@ fn main() -> iced::Result {
 #[derive(Debug)]
 enum Message {
 	ToggleDebug,
-	NumericInputChanged(Option<u32>),
+	NumericInputChanged(u32),
 }
 
 #[derive(Debug)]
 struct App {
 	current_file_path: &'static Path,
 	saved: bool,
+	number: u32,
 	// debug: bool,
 }
 
@@ -37,7 +38,7 @@ impl Sandbox for App {
 		App {
 			current_file_path: Path::new("/test/dev/somethin/äöüdsffd/file.tex"),
 			saved: false,
-			// debug: false,
+			number: 20,
 		}
 	}
 
@@ -52,13 +53,13 @@ impl Sandbox for App {
 	fn update(&mut self, message: Self::Message) {
 		match message {
 			Message::ToggleDebug => {}
-			Message::NumericInputChanged(Some(new_value)) => println!("{new_value}"),
+			Message::NumericInputChanged(new_value) => self.number = new_value,
 			_ => {}
 		}
 	}
 
 	fn view(&self) -> Element<Self::Message> {
-		container(NumericInput::new(Some(20), Message::NumericInputChanged))
+		container(NumericInput::new(self.number, Message::NumericInputChanged))
 			.width(Length::Fill)
 			.height(Length::Fill)
 			.padding(Padding::new(5))
