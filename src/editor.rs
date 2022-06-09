@@ -1,64 +1,43 @@
-use iced::{Column, Element, Text};
+use crate::utils::*;
+
+use iced::pure::{container, row, Element, Sandbox};
+use iced::{container, widget, Background, Color, Length, Padding, Text};
 
 #[derive(Debug)]
 pub struct Editor {
-	pub editor_type: EditorType,
+	pub name: String,
 	pub maximised: bool,
 }
 
+pub struct Message {}
+
 impl Editor {
-	fn new() -> Editor {
-		Editor {
-			editor_type: EditorType::Settings,
+	pub fn new(name: String) -> Self {
+		Self {
+			name,
 			maximised: false,
 		}
 	}
 
-	fn update(&mut self, _msg: StepMessage, _debug: &mut bool) {
-		// self.editor_type[self.current].update(msg, debug);
-	}
-
-	fn view(&mut self, debug: bool) -> Element<StepMessage> {
-		self.editor_type.view(debug)
+	pub fn view<'a>(&self) -> Element<'a, Message> {
+		widget::Container::new(Text::new("Texturia").color(Color::WHITE))
+			.width(Length::Fill)
+			.height(Length::Fill)
+			.padding(Padding::new(5))
+			.style(EditorStyle())
+      .into()
 	}
 }
 
-#[derive(Debug)]
-pub enum EditorType {
-	Settings,
-	Nodes,
-}
+pub struct EditorStyle();
 
-#[derive(Debug, Clone)]
-pub enum StepMessage {
-	MaximisedToggled(bool),
-	DebugToggled(bool),
-}
-
-impl EditorType {
-	fn update(&mut self, msg: StepMessage, debug: &mut bool) {
-		match msg {
-			StepMessage::DebugToggled(new_value) => {}
-			StepMessage::MaximisedToggled(new_value) => {}
-		};
-	}
-
-	fn title(&self) -> &str {
-		match self {
-			EditorType::Settings => "Settings Editor",
-			EditorType::Nodes => "Nodes Editor",
+impl container::StyleSheet for EditorStyle {
+	fn style(&self) -> container::Style {
+		container::Style {
+			background: Some(Background::Color(Color::from_rgb(0.2, 0.2, 0.2))),
+			border_radius: 5.0,
+			border_width: 1.0,
+			..default()
 		}
-	}
-
-	fn view(&mut self, _debug: bool) -> Element<StepMessage> {
-		match self {
-			EditorType::Settings => Self::container("Settings Editor"),
-			EditorType::Nodes => Self::container("Nodes Editor"),
-		}
-		.into()
-	}
-
-	fn container(title: &str) -> Column<StepMessage> {
-		Column::new().spacing(20).push(Text::new(title).size(50))
 	}
 }
